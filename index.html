@@ -1,0 +1,744 @@
+<!doctype html>
+<html lang="zh" class="lang-zh">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MUA · 妆教编译器 / makeup decompiler</title>
+  <meta name="description" content="Give it a look. It decompiles the brushstrokes your hands can replay. An exploratory project — I'd love to build it with you." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- =========================================================== -->
+  <!-- NAV / LANG TOGGLE                                             -->
+  <!-- =========================================================== -->
+  <header class="topbar">
+    <div class="topbar__inner">
+      <a href="#hero" class="brand">
+        <span class="brand__mark">✦</span>
+        <span class="brand__name mono">MUA · <span class="zh">妆教编译器</span><span class="en">makeup decompiler</span></span>
+      </a>
+      <nav class="topnav">
+        <a href="#method"><span class="zh">反编译</span><span class="en">Method</span></a>
+        <a href="#modules"><span class="zh">模块</span><span class="en">Modules</span></a>
+        <a href="#math"><span class="zh">数学</span><span class="en">Math</span></a>
+        <a href="#about"><span class="zh">一起做</span><span class="en">Let&rsquo;s talk</span></a>
+      </nav>
+      <button id="langToggle" class="lang-btn" aria-label="Toggle language">
+        <span class="zh">EN</span><span class="en">中</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- =========================================================== -->
+  <!-- HERO — THE PAIN                                              -->
+  <!-- =========================================================== -->
+  <section id="hero" class="section section--hero">
+    <div class="container">
+      <div class="hero__label mono">[ MUA · v0.1 · <span class="zh">探索中——欢迎一起想</span><span class="en">in exploration — come think with me</span> ]</div>
+
+      <h1 class="hero__title">
+        <span class="zh">出图了，出片了。<br/>可你的手，<em>没学会一个妆</em>。</span>
+        <span class="en">P-shopped. Posted. Liked.<br/>But your hands learned <em>nothing</em>.</span>
+      </h1>
+
+      <p class="hero__lead lead">
+        <span class="zh">你存了上百张<u>P 出来的自己</u>，可下一次约会，<mark>镜子里还是同一张素颜</mark>。出图水平在涨，妆造水平不动——这是 P 图时代留下的<u>执行的缺口</u>。</span>
+        <span class="en">A hundred saved screenshots of <u>the version of you your phone helped fake</u>. <mark>Same face in the mirror, next date.</mark> Editing skill compounds. Makeup skill flatlines — the <u>execution gap</u> the P-shop era left behind.</span>
+      </p>
+
+      <!-- B → 3 M's pain visual -->
+      <div class="pain-visual">
+        <div class="pain-visual__bare">
+          <div class="pain-visual__panel placeholder">
+            <span class="mono">[ B · <span class="zh">素颜</span><span class="en">bare</span> ]</span>
+          </div>
+          <div class="pain-visual__tag mono">B</div>
+        </div>
+        <div class="pain-visual__arrow">→</div>
+        <div class="pain-visual__looks">
+          <div class="pain-visual__look">
+            <div class="pain-visual__panel placeholder">
+              <span class="mono">[ M1 ]</span>
+            </div>
+            <div class="pain-visual__tag mono"><span class="zh">M1 · 日杂</span><span class="en">M1 · clean</span></div>
+          </div>
+          <div class="pain-visual__look">
+            <div class="pain-visual__panel placeholder">
+              <span class="mono">[ M2 ]</span>
+            </div>
+            <div class="pain-visual__tag mono"><span class="zh">M2 · 港风</span><span class="en">M2 · HK retro</span></div>
+          </div>
+          <div class="pain-visual__look">
+            <div class="pain-visual__panel placeholder">
+              <span class="mono">[ M3 ]</span>
+            </div>
+            <div class="pain-visual__tag mono"><span class="zh">M3 · 韩系挂雾</span><span class="en">M3 · K-soft</span></div>
+          </div>
+        </div>
+      </div>
+
+      <p class="pain-visual__caption mono">
+        <span class="zh">▲ 同一张脸（B），三张你 P 出的妆面（M1–M3）。<mark>你能"看见"它们，你不会"画"它们。</mark></span>
+        <span class="en">▲ One face (B), three looks you faked (M1–M3). <mark>You can see them. You can&rsquo;t paint them.</mark></span>
+      </p>
+    </div>
+  </section>
+
+  <!-- =========================================================== -->
+  <!-- REVEAL — MUA STAMP                                            -->
+  <!-- =========================================================== -->
+  <section id="reveal" class="section section--reveal">
+    <div class="container">
+      <div class="reveal-stamp">
+        <div class="reveal-stamp__pre mono">
+          <span class="zh">如果有一个工具，能 →</span>
+          <span class="en">What if a tool could →</span>
+        </div>
+        <div class="reveal-stamp__brand">MUA</div>
+        <div class="reveal-stamp__expand mono">
+          <span class="zh">妆教编译器 · make-up AI · make-up artist</span>
+          <span class="en">makeup decompiler · make-up AI · make-up artist</span>
+        </div>
+        <h2 class="reveal-stamp__pitch">
+          <span class="zh">给它一张妆面，<br/>它<mark>反编译</mark>出能在你脸上复刻的<u>笔触</u>。</span>
+          <span class="en">Give it a look.<br/>It <mark>decompiles</mark> the <u>brushstrokes</u> your hands can replay.</span>
+        </h2>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================== -->
+  <!-- RESULTS — 3 LOOKS, 3 TUTORIALS                                -->
+  <!-- =========================================================== -->
+  <section id="results" class="section section--results">
+    <div class="container">
+      <div class="kicker mono">[ 01 · <span class="zh">结果先看</span><span class="en">Results first</span> ]</div>
+
+      <h2 class="section__title">
+        <span class="zh">那三张妆面 →<br/>每一张都<em>有了一份妆教</em>。</span>
+        <span class="en">Those three looks →<br/>each now <em>comes with a tutorial</em>.</span>
+      </h2>
+
+      <p class="lead">
+        <span class="zh">同一套数学，三种风格，三份按你脸型生成的<mark>笔触序列</mark>。每一笔都对应你手上要做的一件事。</span>
+        <span class="en">Same math, three styles, three <mark>brushstroke sequences</mark> targeted at your own face. Each stroke = one thing your hand actually does.</span>
+      </p>
+
+      <div class="result-strip">
+        <div class="result-strip__head">
+          <div class="result-strip__tag mono">M1 · <span class="zh">日杂</span><span class="en">clean</span></div>
+          <div class="result-strip__count mono">06 strokes</div>
+        </div>
+        <div class="result-strip__frames">
+          <div class="frame placeholder"><span class="mono">B</span></div>
+          <div class="frame placeholder"><span class="mono">笔 01</span></div>
+          <div class="frame placeholder"><span class="mono">笔 02</span></div>
+          <div class="frame placeholder"><span class="mono">笔 03</span></div>
+          <div class="frame placeholder"><span class="mono">笔 04</span></div>
+          <div class="frame placeholder"><span class="mono">笔 05</span></div>
+          <div class="frame placeholder frame--final"><span class="mono">M1 ✓</span></div>
+        </div>
+      </div>
+
+      <div class="result-strip">
+        <div class="result-strip__head">
+          <div class="result-strip__tag mono">M2 · <span class="zh">港风</span><span class="en">HK retro</span></div>
+          <div class="result-strip__count mono">07 strokes</div>
+        </div>
+        <div class="result-strip__frames">
+          <div class="frame placeholder"><span class="mono">B</span></div>
+          <div class="frame placeholder"><span class="mono">笔 01</span></div>
+          <div class="frame placeholder"><span class="mono">笔 02</span></div>
+          <div class="frame placeholder"><span class="mono">笔 03</span></div>
+          <div class="frame placeholder"><span class="mono">笔 04</span></div>
+          <div class="frame placeholder"><span class="mono">笔 05</span></div>
+          <div class="frame placeholder"><span class="mono">笔 06</span></div>
+          <div class="frame placeholder frame--final"><span class="mono">M2 ✓</span></div>
+        </div>
+      </div>
+
+      <div class="result-strip">
+        <div class="result-strip__head">
+          <div class="result-strip__tag mono">M3 · <span class="zh">韩系挂雾</span><span class="en">K-soft</span></div>
+          <div class="result-strip__count mono">05 strokes</div>
+        </div>
+        <div class="result-strip__frames">
+          <div class="frame placeholder"><span class="mono">B</span></div>
+          <div class="frame placeholder"><span class="mono">笔 01</span></div>
+          <div class="frame placeholder"><span class="mono">笔 02</span></div>
+          <div class="frame placeholder"><span class="mono">笔 03</span></div>
+          <div class="frame placeholder"><span class="mono">笔 04</span></div>
+          <div class="frame placeholder frame--final"><span class="mono">M3 ✓</span></div>
+        </div>
+      </div>
+
+      <p class="muted mono results__caption">
+        <span class="zh">▲ 每一格 = 一笔反编译后的中间妆面。你照着它，从素颜走到目标。</span>
+        <span class="en">▲ Each cell = one decompiled intermediate. You follow them, from bare to target.</span>
+      </p>
+
+      <div class="results__cta">
+        <a href="#method" class="btn btn--primary">
+          <span class="zh">看 MUA 怎么反编译 →</span>
+          <span class="en">See how MUA decompiles →</span>
+        </a>
+        <a href="#about" class="btn btn--ghost">
+          <span class="zh">想一起把它做大？</span>
+          <span class="en">Want to build this with me?</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================== -->
+  <!-- METHOD — 反编译三步                                           -->
+  <!-- =========================================================== -->
+  <section id="method" class="section section--method">
+    <div class="container">
+      <div class="kicker mono">[ 02 · <span class="zh">反编译三步</span><span class="en">The Decompile Pass</span> ]</div>
+
+      <h2 class="section__title">
+        <span class="zh">一张妆面 → 三步 → 一份妆教。</span>
+        <span class="en">One look. Three passes. A tutorial.</span>
+      </h2>
+
+      <p class="lead">
+        <span class="zh">这套流程<u>我目前的想法是这样</u>——欢迎挑刺。三步都可独立替换，整个 pipeline 是<mark>可重组的</mark>。</span>
+        <span class="en">This is <u>my current take</u> — push back if you see better. Each pass is swappable; the whole pipeline is <mark>recomposable</mark>.</span>
+      </p>
+
+      <div class="acts">
+        <article class="act">
+          <div class="act__num mono">PASS 01</div>
+          <h3 class="act__title">
+            <span class="zh">抽取 · Peel</span>
+            <span class="en">Peel</span>
+          </h3>
+          <p>
+            <span class="zh">从素颜 <code>B</code> 与上妆 <code>M</code> 中分离出<u>纯妆面层</u> <code>D</code>。</span>
+            <span class="en">From bare <code>B</code> and made-up <code>M</code>, isolate the <u>pure pigment layer</u> <code>D</code>.</span>
+          </p>
+          <div class="act__formula">
+            <code>D = (M − B·p) / (1−p)</code>
+          </div>
+          <div class="act__visual placeholder">
+            <span class="mono">[ B → D ghost layer ]</span>
+          </div>
+        </article>
+
+        <article class="act">
+          <div class="act__num mono">PASS 02</div>
+          <h3 class="act__title">
+            <span class="zh">解构 · Decompose</span>
+            <span class="en">Decompose</span>
+          </h3>
+          <p>
+            <span class="zh">把 <code>D</code> 拆成 N 个<u>基础颜料色</u> + 每个颜料在面部的分布图。</span>
+            <span class="en">Decompose <code>D</code> into N <u>base pigments</u> + each pigment&rsquo;s spatial map on the face.</span>
+          </p>
+          <div class="palette-strip">
+            <span class="swatch" style="background:#C2185B"></span>
+            <span class="swatch" style="background:#D4A89A"></span>
+            <span class="swatch" style="background:#8B5A3C"></span>
+            <span class="swatch" style="background:#6B4423"></span>
+            <span class="swatch" style="background:#F4C2C2"></span>
+            <span class="swatch" style="background:#1A0E08"></span>
+          </div>
+          <div class="act__visual placeholder">
+            <span class="mono">[ alpha maps · K=6 ]</span>
+          </div>
+        </article>
+
+        <article class="act act--featured">
+          <div class="act__num mono">PASS 03 ✦</div>
+          <h3 class="act__title">
+            <span class="zh">复刻 · Replay</span>
+            <span class="en">Replay</span>
+          </h3>
+          <p>
+            <span class="zh">用 Porter-Duff 合成把颜料按顺序叠回素颜——<mark>每一笔对应你手上的一件事</mark>。</span>
+            <span class="en">Use Porter-Duff compositing to stack pigments back over bare skin — <mark>one brushstroke = one thing your hand does</mark>.</span>
+          </p>
+
+          <!-- Stroke scrubber -->
+          <div class="scrubber">
+            <div class="scrubber__stage placeholder">
+              <span class="mono" id="scrubLabel">STROKE 00 / 06 — bare</span>
+            </div>
+            <input type="range" min="0" max="6" value="0" step="1" id="scrubInput" class="scrubber__input" aria-label="Stroke" />
+            <div class="scrubber__ticks mono">
+              <span>0 · bare</span>
+              <span>1 · base</span>
+              <span>2 · brow</span>
+              <span>3 · eye</span>
+              <span>4 · cheek</span>
+              <span>5 · lip</span>
+              <span>6 · final</span>
+            </div>
+          </div>
+          <p class="act__caption mono">
+            <span class="zh">▲ 拖动滑块——这就是输出的"妆教"</span>
+            <span class="en">▲ Drag the slider — this IS the generated tutorial</span>
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================== -->
+  <!-- REGION INTELLIGENCE                                           -->
+  <!-- =========================================================== -->
+  <section id="region" class="section section--region">
+    <div class="container container--narrow">
+      <div class="kicker mono">[ 03 · <span class="zh">分区</span><span class="en">Region</span> ]</div>
+
+      <h2 class="section__title">
+        <span class="zh">不是给像素上色，<br/>是给<em>嘴唇</em>上色。</span>
+        <span class="en">Don&rsquo;t color pixels.<br/>Color <em>lips</em>.</span>
+      </h2>
+
+      <p class="lead">
+        <span class="zh">脸先被切成有名字的区域（唇 / 眼 / 颊 / 鼻 / ...），再做颜料解构。妆教因此能<mark>说"在嘴唇上点玫瑰色"</mark>，而不是"在某团像素上涂颜色"。</span>
+        <span class="en">The face is first cut into named regions (lips / eyes / cheek / nose / ...) before any color decomposition. That&rsquo;s why a stroke can <mark>say &ldquo;dab rose on lips&rdquo;</mark>, not &ldquo;color this blob of pixels&rdquo;.</span>
+      </p>
+
+      <div class="region-demo">
+        <div class="region-demo__face placeholder">
+          <span class="mono">[ face with region overlay ]</span>
+        </div>
+        <ul class="region-demo__legend mono">
+          <li><span class="dot" style="background:#C2185B"></span>lips</li>
+          <li><span class="dot" style="background:#6B4423"></span>brows</li>
+          <li><span class="dot" style="background:#1A0E08"></span>eyes</li>
+          <li><span class="dot" style="background:#D4A89A"></span>cheek</li>
+          <li><span class="dot" style="background:#8B5A3C"></span>nose</li>
+          <li><span class="dot" style="background:#F4C2C2"></span>perioral</li>
+        </ul>
+      </div>
+
+      <p class="muted mono">
+        <span class="zh">基于 MediaPipe 468 关键点 → 凸包多边形 → 优先级裁剪，得到不重叠的分区。</span>
+        <span class="en">MediaPipe&rsquo;s 468 landmarks → convex-hull polygons → priority-based pixel claiming for non-overlapping regions.</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- =========================================================== -->
+  <!-- MODULES                                                       -->
+  <!-- =========================================================== -->
+  <section id="modules" class="section section--modules">
+    <div class="container">
+      <div class="kicker mono">[ 04 · <span class="zh">四个模块</span><span class="en">Modules</span> ]</div>
+
+      <h2 class="section__title">
+        <span class="zh">四块砖。<br/><em>每一块都能拿出来单卖</em>。</span>
+        <span class="en">Four bricks.<br/><em>Any one ships standalone</em>.</span>
+      </h2>
+
+      <p class="lead">
+        <span class="zh">这不是一个黑盒——是<mark>四个互相解耦的模块</mark>。合在一起做妆教；拆出任意一个，都能在自己领域用。<u>如果你的项目用得到其中任一个，欢迎聊聊。</u></span>
+        <span class="en">Not a black box — <mark>four decoupled modules</mark>. Together they generate tutorials. Pulled apart, each holds value on its own. <u>If any one fits your project, let&rsquo;s talk.</u></span>
+      </p>
+
+      <div class="modules-grid">
+
+        <article class="module-card">
+          <header class="module-card__head">
+            <div class="module-card__num mono">M / 01</div>
+            <h3>Peel</h3>
+          </header>
+          <div class="module-card__io mono">
+            <div><span class="io-tag">IN</span> B, M</div>
+            <div><span class="io-tag">OUT</span> D, mask</div>
+          </div>
+          <p>
+            <span class="zh">从素颜 / 上妆双图中分离纯颜料层。alpha 合成的闭式反演。</span>
+            <span class="en">Isolates the pure pigment layer from a bare / made-up pair. A closed-form inversion of alpha compositing.</span>
+          </p>
+          <div class="module-card__use mono">
+            <span class="zh">▸ 单独用：</span><span class="en">▸ Standalone:</span>
+            <span class="zh">皮肤医学比对、护肤前后量化、色彩科学。</span>
+            <span class="en">Dermatology before/after, skincare quantification, color science.</span>
+          </div>
+        </article>
+
+        <article class="module-card">
+          <header class="module-card__head">
+            <div class="module-card__num mono">M / 02</div>
+            <h3>Segmentation</h3>
+          </header>
+          <div class="module-card__io mono">
+            <div><span class="io-tag">IN</span> face image</div>
+            <div><span class="io-tag">OUT</span> region masks</div>
+          </div>
+          <p>
+            <span class="zh">由关键点构造的语义分区——不重叠、按优先级裁剪。比像素级 semseg 轻量、可解释。</span>
+            <span class="en">Landmark-driven semantic regions — non-overlapping, priority-claimed. Lighter and more interpretable than pixel-wise semseg.</span>
+          </p>
+          <div class="module-card__use mono">
+            <span class="zh">▸ 单独用：</span><span class="en">▸ Standalone:</span>
+            <span class="zh">面部 AR 贴纸、区域美颜、皮肤分析。</span>
+            <span class="en">Face AR stickers, region-specific beauty filters, skin analysis.</span>
+          </div>
+        </article>
+
+        <article class="module-card">
+          <header class="module-card__head">
+            <div class="module-card__num mono">M / 03</div>
+            <h3>Unmix</h3>
+          </header>
+          <div class="module-card__io mono">
+            <div><span class="io-tag">IN</span> D, N</div>
+            <div><span class="io-tag">OUT</span> palette + α-maps</div>
+          </div>
+          <p>
+            <span class="zh">把任何颜料层解构成 N 个基础色 + 每个色的空间权重图。凸包 / GMM 两种实现。</span>
+            <span class="en">Decomposes any pigment layer into N base colors + per-color weight maps. Convex-hull and GMM variants.</span>
+          </p>
+          <div class="module-card__use mono">
+            <span class="zh">▸ 单独用：</span><span class="en">▸ Standalone:</span>
+            <span class="zh">品牌色匹配、绘画分析、油漆 / 印刷色复原。</span>
+            <span class="en">Brand color matching, painting analysis, paint / print color recovery.</span>
+          </div>
+        </article>
+
+        <article class="module-card">
+          <header class="module-card__head">
+            <div class="module-card__num mono">M / 04</div>
+            <h3>Stroke Generator</h3>
+          </header>
+          <div class="module-card__io mono">
+            <div><span class="io-tag">IN</span> B, palette, α-maps</div>
+            <div><span class="io-tag">OUT</span> ordered strokes</div>
+          </div>
+          <p>
+            <span class="zh">把解构结果按 Porter-Duff 合成顺序叠回——每一笔对应一件化妆品的覆盖。</span>
+            <span class="en">Replays the decomposition via Porter-Duff compositing — each stroke = one cosmetic&rsquo;s coverage.</span>
+          </p>
+          <div class="module-card__use mono">
+            <span class="zh">▸ 单独用：</span><span class="en">▸ Standalone:</span>
+            <span class="zh">任何分层教学：绘画、插画、设计教程合成。</span>
+            <span class="en">Any layered tutorial generation: painting, illustration, design.</span>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================== -->
+  <!-- MATH                                                          -->
+  <!-- =========================================================== -->
+  <section id="math" class="section section--math">
+    <div class="container">
+      <div class="kicker kicker--inv mono">[ 05 · <span class="zh">背后的数学</span><span class="en">The math behind it</span> ]</div>
+
+      <h2 class="section__title section__title--inv">
+        <span class="zh">所有视觉效果，<br/>背后是<em>三个公式</em>。</span>
+        <span class="en">Everything visual<br/>collapses to <em>three equations</em>.</span>
+      </h2>
+
+      <p class="lead lead--inv">
+        <span class="zh">写在这儿不是为了证明谁的智商——是<mark>欢迎被挑战、被改进、被替换</mark>。如果你看到更好的解法，我想听。</span>
+        <span class="en">Not here to flex — here to be <mark>challenged, improved, replaced</mark>. If you see a better solution, I want to hear it.</span>
+      </p>
+
+      <div class="math-block">
+        <div class="math-block__num mono">EQ / 01</div>
+        <h3 class="math-block__title">
+          <span class="zh">抽取方程 · Peel</span>
+          <span class="en">The Peel Equation</span>
+        </h3>
+        <p>
+          <span class="zh">假设上妆图 <code>M</code> 是素颜 <code>B</code> 与妆面颜料 <code>D</code> 的线性混合，<code>p</code> 是裸肤可见比例：</span>
+          <span class="en">Assume the made-up image <code>M</code> is a linear mixture of bare skin <code>B</code> and pigment <code>D</code>, with <code>p</code> the visible bare-skin fraction:</span>
+        </p>
+        <div class="math-render">$$ M(x,y) = p \cdot B(x,y) + (1-p) \cdot D(x,y) $$</div>
+        <p>
+          <span class="zh">求解 <code>D</code>：</span>
+          <span class="en">Solving for <code>D</code>:</span>
+        </p>
+        <div class="math-render math-render--key">$$ D(x,y) = \frac{M(x,y) - p \cdot B(x,y)}{1 - p} $$</div>
+        <p class="muted mono">
+          <span class="zh">这是整个项目的<u>地基</u>——一个一阶可解的反问题。</span>
+          <span class="en">The <u>foundation</u> — a first-order, closed-form inverse.</span>
+        </p>
+      </div>
+
+      <div class="math-block">
+        <div class="math-block__num mono">EQ / 02</div>
+        <h3 class="math-block__title">
+          <span class="zh">凸组合解构 · Convex Decomposition</span>
+          <span class="en">Convex Decomposition</span>
+        </h3>
+        <p>
+          <span class="zh">妆面层 <code>D</code> 的每个像素都建模为 N 个基础颜料色 <code>c_k</code> 的凸组合：</span>
+          <span class="en">Each pixel of <code>D</code> is modeled as a convex combination of N base pigments <code>c_k</code>:</span>
+        </p>
+        <div class="math-render">$$ D(x,y) \;=\; \sum_{k=1}^{N} \alpha_k(x,y) \cdot c_k, \quad \alpha_k \ge 0,\; \sum_k \alpha_k = 1 $$</div>
+        <p>
+          <span class="zh">调色板 <code>{c_k}</code> 取自像素 RGB 凸包顶点的<u>最远点采样</u>。每像素 <code>α</code> 通过单纯形约束最小二乘求解。</span>
+          <span class="en">The palette <code>{c_k}</code> comes from <u>farthest-point sampling</u> on the convex-hull vertices of pixel-RGB. Per-pixel <code>α</code> is solved via simplex-constrained least squares.</span>
+        </p>
+      </div>
+
+      <div class="math-block">
+        <div class="math-block__num mono">EQ / 03</div>
+        <h3 class="math-block__title">
+          <span class="zh">Porter-Duff 累积覆盖 · Stroke Compositing</span>
+          <span class="en">Porter-Duff Cumulative Coverage</span>
+        </h3>
+        <p>
+          <span class="zh">第 <code>k</code> 笔的可见覆盖率不是 <code>α_k</code> 本身——要除以"该笔及之后所有层的总贡献"，保证最终一笔后精确等于 M：</span>
+          <span class="en">Stroke <code>k</code>&rsquo;s visible coverage is not <code>α_k</code> itself — it must be divided by &ldquo;this and all later layers&rsquo; total contribution&rdquo; — so the final stroke equals M exactly:</span>
+        </p>
+        <div class="math-render">$$ P_{k+1} \;=\; 1 - (1-p)\cdot\!\!\!\sum_{j=k+1}^{N} \alpha_j(x,y) $$</div>
+        <div class="math-render math-render--key">$$ \lambda_k(x,y) \;=\; \frac{\alpha_k(x,y)\cdot(1-p)}{P_{k+1}} $$</div>
+        <div class="math-render">$$ E_k(x,y) \;=\; (1-\lambda_k)\cdot E_{k-1}(x,y) \;+\; \lambda_k \cdot c_k $$</div>
+        <p class="muted mono">
+          <span class="zh">λ 的推导是项目的<u>非平凡贡献</u>——直接用 α 做合成会让最终帧偏离 M。</span>
+          <span class="en">The λ derivation is the <u>non-trivial part</u> — naively using α drifts the final frame off-target.</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================== -->
+  <!-- LIMITATIONS                                                   -->
+  <!-- =========================================================== -->
+  <section id="limitations" class="section section--limits">
+    <div class="container container--narrow">
+      <div class="kicker mono">[ 06 · <span class="zh">边界</span><span class="en">Edges</span> ]</div>
+
+      <h2 class="section__title">
+        <span class="zh">做到的，<br/>还没做到的。</span>
+        <span class="en">What works.<br/>What I haven&rsquo;t cracked.</span>
+      </h2>
+
+      <p class="lead">
+        <span class="zh">没有一个真在迭代的系统是没有边界的。我把它们摆在这儿——<mark>不是缺点，是邀请你一起想下一步</mark>。</span>
+        <span class="en">No system that&rsquo;s actually being iterated has no edges. I&rsquo;m putting them here — <mark>not as caveats, but as invitations to think about what&rsquo;s next</mark>.</span>
+      </p>
+
+      <div class="limits-grid">
+        <article class="limit-card limit-card--works">
+          <div class="limit-card__tag mono">✓ <span class="zh">已跑通</span><span class="en">Works</span></div>
+          <h3>
+            <span class="zh">端到端 pipeline</span>
+            <span class="en">End-to-end pipeline</span>
+          </h3>
+          <p>
+            <span class="zh">p=70 / N=6 下，重建 RMSE ~2.9（0–255 满量程）。最后一笔与 M 数学上严格相等。</span>
+            <span class="en">At p=70 / N=6, reconstruction RMSE ~2.9 on a 0–255 scale. The final stroke equals M exactly.</span>
+          </p>
+        </article>
+
+        <article class="limit-card limit-card--works">
+          <div class="limit-card__tag mono">✓ <span class="zh">已跑通</span><span class="en">Works</span></div>
+          <h3>
+            <span class="zh">分区语义化妆教</span>
+            <span class="en">Region-aware tutorial</span>
+          </h3>
+          <p>
+            <span class="zh">基于 MediaPipe 468 点 + 优先级裁剪，可输出"在唇 / 眼周 / 脸颊"等具名指令。</span>
+            <span class="en">From MediaPipe&rsquo;s 468 landmarks + priority claiming, outputs named instructions: &ldquo;on lips / eyes / cheek …&rdquo;.</span>
+          </p>
+        </article>
+
+        <article class="limit-card limit-card--solving">
+          <div class="limit-card__tag mono">◐ <span class="zh">在做</span><span class="en">In progress</span></div>
+          <h3>
+            <span class="zh">深色颜料 (signed-D)</span>
+            <span class="en">Dark pigments (signed-D)</span>
+          </h3>
+          <p>
+            <span class="zh">眼线 / 修容产生<u>负向 D</u>，调色板会出现负色。显示公式已确认，待实现：<code>display = clip(skin + palette·255)</code>。</span>
+            <span class="en">Eyeliner / contour produce <u>negative D</u>; palette entries can go negative. Display formula agreed but not yet wired: <code>display = clip(skin + palette·255)</code>.</span>
+          </p>
+        </article>
+
+        <article class="limit-card limit-card--solving">
+          <div class="limit-card__tag mono">◐ <span class="zh">在做</span><span class="en">In progress</span></div>
+          <h3>
+            <span class="zh">K-means → GMM 迁移</span>
+            <span class="en">K-means → GMM migration</span>
+          </h3>
+          <p>
+            <span class="zh">发现 K-means 调色板会让单纯形投影产生<u>块状伪影</u>。已切到 GMM 软后验，明显更平滑。</span>
+            <span class="en">K-means palette caused <u>blocky artifacts</u> from piecewise-constant simplex projection. Switched to GMM soft posteriors — visibly smoother.</span>
+          </p>
+        </article>
+
+        <article class="limit-card limit-card--open">
+          <div class="limit-card__tag mono">◯ <span class="zh">开放</span><span class="en">Open</span></div>
+          <h3>
+            <span class="zh">感知损失函数</span>
+            <span class="en">Perceptual loss</span>
+          </h3>
+          <p>
+            <span class="zh">当前 RGB L2 把色相与亮度<u>等权处理</u>。人眼对亮度更敏感——计划迁到 Lab / 加权 RGB。<mark>有更好的方案欢迎指点</mark>。</span>
+            <span class="en">Current L2 in RGB weighs hue and brightness <u>equally</u>. The eye is more sensitive to brightness — planning a move to Lab or weighted RGB. <mark>Better ideas welcome</mark>.</span>
+          </p>
+        </article>
+
+        <article class="limit-card limit-card--open">
+          <div class="limit-card__tag mono">◯ <span class="zh">开放</span><span class="en">Open</span></div>
+          <h3>
+            <span class="zh">调色板 ≠ 真实颜料</span>
+            <span class="en">Palette ≠ true pigments</span>
+          </h3>
+          <p>
+            <span class="zh">所有像素本身就是<u>混合物</u>，凸包顶点是最极端的混合色，不是品牌方的纯颜料。<mark>这是一个会影响商业化的根本约束——我也在想该怎么破</mark>。</span>
+            <span class="en">All pixels are <u>already mixtures</u>; hull vertices are the most extreme mixtures, not real brand pigments. <mark>A structural constraint for commercialization — I&rsquo;m still thinking about how to break it</mark>.</span>
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================== -->
+  <!-- VISION                                                        -->
+  <!-- =========================================================== -->
+  <section id="vision" class="section section--vision">
+    <div class="container">
+      <div class="kicker mono">[ 07 · <span class="zh">商业愿景</span><span class="en">Vision</span> ]</div>
+
+      <h2 class="section__title">
+        <span class="zh">两条腿走路，<br/>中间是一只<em>飞轮</em>。</span>
+        <span class="en">Two legs.<br/>One <em>flywheel</em> in between.</span>
+      </h2>
+
+      <p class="lead">
+        <span class="zh">这是我目前能想到的最直接的路径——<mark>很可能不是最优解</mark>。如果你看美妆 / AIGC / 工具型 AI 的赛道，<u>我想跟你换换思路</u>。</span>
+        <span class="en">This is the most direct path I can currently see — <mark>almost certainly not the optimal one</mark>. If you watch beauty / AIGC / AI-native tools, <u>I&rsquo;d like to trade notes</u>.</span>
+      </p>
+
+      <div class="vision-grid">
+        <article class="vision-card">
+          <div class="vision-card__tag mono">B2C</div>
+          <h3>
+            <span class="zh">微信小程序</span>
+            <span class="en">WeChat Mini-Program</span>
+          </h3>
+          <p>
+            <span class="zh">用户传一张妆面，得到<mark>专属于自己脸的妆教</mark>。低门槛、即开即用、社交传播。</span>
+            <span class="en">Users upload a look, get a tutorial <mark>personalized to their own face</mark>. Low-friction, instant, socially shareable.</span>
+          </p>
+        </article>
+
+        <article class="vision-card">
+          <div class="vision-card__tag mono">B2B</div>
+          <h3>
+            <span class="zh">品牌内容引擎</span>
+            <span class="en">Brand content engine</span>
+          </h3>
+          <p>
+            <span class="zh">化妆品品牌按产品图 + 模特脸<mark>批量生成妆教</mark>，自动覆盖小红书 / 抖音内容生产。</span>
+            <span class="en">Cosmetic brands <mark>generate tutorial content at scale</mark> from product shots + model faces.</span>
+          </p>
+        </article>
+
+        <article class="vision-card vision-card--featured">
+          <div class="vision-card__tag mono">FLYWHEEL ✦</div>
+          <h3>
+            <span class="zh">数据飞轮</span>
+            <span class="en">Data flywheel</span>
+          </h3>
+          <p>
+            <span class="zh">每一份生成的妆教都<mark>反过来训练系统更懂妆面</mark>——风格库越大，反编译越准，B2B / B2C 双边复利。</span>
+            <span class="en">Every tutorial generated <mark>trains the system to understand makeup better</mark> — the larger the style library, the cleaner the decompile, compounding on both sides.</span>
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================== -->
+  <!-- ABOUT — INVITE MODE                                           -->
+  <!-- =========================================================== -->
+  <section id="about" class="section section--about">
+    <div class="container container--narrow">
+      <div class="kicker mono">[ 08 · <span class="zh">一起做？</span><span class="en">Build with me?</span> ]</div>
+
+      <h2 class="section__title">
+        <span class="zh">这是我一个人做的——<br/>但<em>不是终点</em>。我在找人。</span>
+        <span class="en">I built this alone.<br/>But this isn&rsquo;t where it ends. I&rsquo;m <em>looking</em>.</span>
+      </h2>
+
+      <p class="lead">
+        <span class="zh">物理、数学、模块、所有 limitations——目前都是我一个人在想。这个 idea 我相信它能走远，<mark>但它需要更多人推它一把</mark>：</span>
+        <span class="en">The model, the math, the modules, every limitation — all of it is just me, thinking. I believe this idea can travel far, <mark>but it takes more people to push</mark>:</span>
+      </p>
+
+      <ul class="invite-list">
+        <li>
+          <span class="invite-list__icon">✦</span>
+          <span class="zh"><strong>美妆 / 化妆师</strong>——告诉我"画妆"在现实里是什么样的流程，我的模型大概率简化错了。</span>
+          <span class="en"><strong>Makeup artists / industry folks</strong> — tell me how real-world makeup actually gets painted. My model is almost certainly the wrong simplification.</span>
+        </li>
+        <li>
+          <span class="invite-list__icon">✦</span>
+          <span class="zh"><strong>研究 / 工程师</strong>——挑战这套数学。Lab 空间损失、GMM 调参、感知评估，都欢迎来打。</span>
+          <span class="en"><strong>Researchers / engineers</strong> — stress-test the math. Lab-space loss, GMM tuning, perceptual evaluation — come at it.</span>
+        </li>
+        <li>
+          <span class="invite-list__icon">✦</span>
+          <span class="zh"><strong>产品 / 合伙人</strong>——做下一代美妆工具的，咱们换换思路。</span>
+          <span class="en"><strong>Product folks / co-founders</strong> — anyone building next-gen beauty tools, let&rsquo;s trade notes.</span>
+        </li>
+        <li>
+          <span class="invite-list__icon">✦</span>
+          <span class="zh"><strong>被这个点子吸到的朋友</strong>——你不用是任何"专业"。能聊就行。</span>
+          <span class="en"><strong>Anyone the idea pulls in</strong> — you don&rsquo;t need credentials. A conversation is enough.</span>
+        </li>
+      </ul>
+
+      <div class="contact-card">
+        <div class="contact-card__row mono">
+          <span class="contact-card__k">EMAIL</span>
+          <span class="contact-card__v">[ your-email@domain ]</span>
+        </div>
+        <div class="contact-card__row mono">
+          <span class="contact-card__k">CODE</span>
+          <span class="contact-card__v">
+            <span class="zh">私密仓库 · 接触后开放</span>
+            <span class="en">Private repo · opened on request</span>
+          </span>
+        </div>
+        <div class="contact-card__row mono">
+          <span class="contact-card__k">LOOKING</span>
+          <span class="contact-card__v">
+            <span class="zh">合伙人 / 资深工程师 / 行业顾问 / 想聊的人</span>
+            <span class="en">Co-founder / senior engineer / industry advisor / curious people</span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================== -->
+  <!-- FOOTER                                                        -->
+  <!-- =========================================================== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__row mono">
+        <span>✦ MUA · <span class="zh">妆教编译器</span><span class="en">makeup decompiler</span></span>
+        <span class="zh">© 2026 · 还在长 · come build it bigger</span>
+        <span class="en">© 2026 · still growing · come build it bigger</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
