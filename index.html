@@ -1,14 +1,14 @@
 <!doctype html>
-<html lang="zh" class="lang-zh">
+<html lang="en" class="lang-en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MUA · 妆教编译器 / makeup decompiler</title>
-  <meta name="description" content="Give it a look. It decompiles the brushstrokes your hands can replay. An exploratory project — I'd love to build it with you." />
+  <title>GMR: Gaussian Makeup Replayer</title>
+  <meta name="description" content="A Gaussian-mixture pipeline for facial cosmetic decomposition and brushstroke replay. Independent project, 2026." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous" />
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
@@ -18,20 +18,23 @@
 </head>
 <body>
 
-  <!-- =========================================================== -->
-  <!-- NAV / LANG TOGGLE                                             -->
-  <!-- =========================================================== -->
+  <!-- ============================================================ -->
+  <!-- NAV / LANG TOGGLE                                              -->
+  <!-- ============================================================ -->
   <header class="topbar">
     <div class="topbar__inner">
-      <a href="#hero" class="brand">
+      <a href="#top" class="brand">
         <span class="brand__mark">✦</span>
-        <span class="brand__name mono">MUA · <span class="zh">妆教编译器</span><span class="en">makeup decompiler</span></span>
+        <span class="brand__name mono">GMR</span>
+        <span class="brand__full mono">· Gaussian Makeup Replayer</span>
       </a>
       <nav class="topnav">
-        <a href="#method"><span class="zh">反编译</span><span class="en">Method</span></a>
-        <a href="#modules"><span class="zh">模块</span><span class="en">Modules</span></a>
-        <a href="#math"><span class="zh">数学</span><span class="en">Math</span></a>
-        <a href="#about"><span class="zh">一起做</span><span class="en">Let&rsquo;s talk</span></a>
+        <a href="#results"><span class="zh">结果</span><span class="en">Results</span></a>
+        <a href="#method"><span class="zh">方法</span><span class="en">Method</span></a>
+        <a href="#architecture"><span class="zh">架构</span><span class="en">Architecture</span></a>
+        <a href="#formulation"><span class="zh">公式</span><span class="en">Formulation</span></a>
+        <a href="#future"><span class="zh">未来</span><span class="en">Future Work</span></a>
+        <a href="#contact"><span class="zh">联系</span><span class="en">Contact</span></a>
       </nav>
       <button id="langToggle" class="lang-btn" aria-label="Toggle language">
         <span class="zh">EN</span><span class="en">中</span>
@@ -39,702 +42,699 @@
     </div>
   </header>
 
-  <!-- =========================================================== -->
-  <!-- HERO — THE PAIN                                              -->
-  <!-- =========================================================== -->
-  <section id="hero" class="section section--hero">
-    <div class="container">
-      <div class="hero__label mono">[ MUA · v0.1 · <span class="zh">探索中——欢迎一起想</span><span class="en">in exploration — come think with me</span> ]</div>
+  <!-- ============================================================ -->
+  <!-- §0 · TITLE + ABSTRACT                                          -->
+  <!-- ============================================================ -->
+  <section id="top" class="section section--abstract">
+    <div class="container container--narrow">
 
-      <h1 class="hero__title">
-        <span class="zh">出图了，出片了。<br/>可你的手，<em>没学会一个妆</em>。</span>
-        <span class="en">P-shopped. Posted. Liked.<br/>But your hands learned <em>nothing</em>.</span>
+      <div class="paper-meta mono">
+        [ GMR · A Gaussian-mixture pipeline for facial cosmetic decomposition · 2026 · independent · v0.1 ]
+      </div>
+
+      <h1 class="paper-title">
+        <span class="zh">GMR：高斯妆容复演器</span>
+        <span class="en">GMR: Gaussian Makeup Replayer</span>
       </h1>
-
-      <p class="hero__lead lead">
-        <span class="zh">你存了上百张<u>P 出来的自己</u>，可下一次约会，<mark>镜子里还是同一张素颜</mark>。出图水平在涨，妆造水平不动——这是 P 图时代留下的<u>执行的缺口</u>。</span>
-        <span class="en">A hundred saved screenshots of <u>the version of you your phone helped fake</u>. <mark>Same face in the mirror, next date.</mark> Editing skill compounds. Makeup skill flatlines — the <u>execution gap</u> the P-shop era left behind.</span>
+      <p class="paper-subtitle">
+        <span class="zh">基于高斯混合的妆面分解与笔触复演 pipeline。</span>
+        <span class="en">A Gaussian-mixture pipeline for facial cosmetic decomposition and brushstroke replay.</span>
       </p>
 
-      <!-- B → 3 M's pain visual -->
-      <div class="pain-visual">
-        <div class="pain-visual__bare">
-          <div class="pain-visual__panel placeholder">
-            <span class="mono">[ B · <span class="zh">素颜</span><span class="en">bare</span> ]</span>
-          </div>
-          <div class="pain-visual__tag mono">B</div>
-        </div>
-        <div class="pain-visual__arrow">→</div>
-        <div class="pain-visual__looks">
-          <div class="pain-visual__look">
-            <div class="pain-visual__panel placeholder">
-              <span class="mono">[ M1 ]</span>
-            </div>
-            <div class="pain-visual__tag mono"><span class="zh">M1 · 日杂</span><span class="en">M1 · clean</span></div>
-          </div>
-          <div class="pain-visual__look">
-            <div class="pain-visual__panel placeholder">
-              <span class="mono">[ M2 ]</span>
-            </div>
-            <div class="pain-visual__tag mono"><span class="zh">M2 · 港风</span><span class="en">M2 · HK retro</span></div>
-          </div>
-          <div class="pain-visual__look">
-            <div class="pain-visual__panel placeholder">
-              <span class="mono">[ M3 ]</span>
-            </div>
-            <div class="pain-visual__tag mono"><span class="zh">M3 · 韩系挂雾</span><span class="en">M3 · K-soft</span></div>
-          </div>
-        </div>
+      <div class="paper-authors mono">
+        <span>JT. Z.</span>
+        <span class="dim">·</span>
+        <span><span class="zh">独立项目</span><span class="en">Independent project</span></span>
+        <span class="dim">·</span>
+        <span>2026</span>
       </div>
 
-      <p class="pain-visual__caption mono">
-        <span class="zh">▲ 同一张脸（B），三张你 P 出的妆面（M1–M3）。<mark>你能"看见"它们，你不会"画"它们。</mark></span>
-        <span class="en">▲ One face (B), three looks you faked (M1–M3). <mark>You can see them. You can&rsquo;t paint them.</mark></span>
-      </p>
+      <div class="paper-links">
+        <a class="plink" href="https://github.com/545411679/GMR-project-demo" target="_blank" rel="noopener">[ GitHub ]</a>
+        <a class="plink" href="#citation">[ BibTeX ]</a>
+        <a class="plink" href="#results">[ Demo ]</a>
+      </div>
+
+      <div class="abstract-block">
+        <div class="abstract-label mono">Abstract</div>
+        <p class="abstract-body">
+          <span class="zh">本工作提出 Gaussian Makeup Replayer（GMR），一种将妆面图像分解为基于高斯混合的色号 palette、并以有序 brushstroke 序列在素颜目标上复演结果的方法。给定同一对象的素颜图像 <code>B</code> 与上妆图像 <code>M</code>，GMR 依次执行：(i) 反演 alpha 合成以恢复妆面层 <code>D</code>；(ii) 在 RGB 空间通过 K 分量 GMM 将 <code>D</code> 分解为 N 个基础色号；(iii) 基于关键点驱动的掩码将色号分配至语义化面部分区；(iv) 合成有序 brushstroke 复演序列。我们在多个 subject 与多种风格强度的输入妆面上给出定性结果，并在 GMR(p=0.70, N=6) 配置下报告重建 RMSE。</span>
+          <span class="en">We present Gaussian Makeup Replayer (GMR), a method for decomposing facial cosmetic images into a Gaussian-mixture shade palette and replaying the result as an ordered brushstroke sequence on a bare-face target. Given a bare-face image <code>B</code> and a made-up image <code>M</code> of the same subject, GMR (i) inverts the alpha composite to recover the cosmetic layer <code>D</code>, (ii) decomposes <code>D</code> into N base shades via a K-component GMM in RGB space, (iii) assigns shades to semantic face regions via landmark-driven masks, and (iv) synthesizes an ordered brushstroke replay. We report qualitative results across multiple subjects at varying style intensities and reconstruction RMSE under the GMR(p=0.70, N=6) configuration.</span>
+        </p>
+      </div>
     </div>
   </section>
 
-  <!-- =========================================================== -->
-  <!-- REVEAL — MUA STAMP                                            -->
-  <!-- =========================================================== -->
-  <section id="reveal" class="section section--reveal">
+  <!-- ============================================================ -->
+  <!-- ─ M · MOTIVATION  (deferred — placeholder)                     -->
+  <!-- ============================================================ -->
+  <section id="motivation" class="section section--motivation">
     <div class="container">
-      <div class="reveal-stamp">
-        <div class="reveal-stamp__pre mono">
-          <span class="zh">如果有一个工具，能 →</span>
-          <span class="en">What if a tool could →</span>
-        </div>
-        <div class="reveal-stamp__brand">MUA</div>
-        <div class="reveal-stamp__expand mono">
-          <span class="zh">妆教编译器 · make-up AI · make-up artist</span>
-          <span class="en">makeup decompiler · make-up AI · make-up artist</span>
-        </div>
-        <h2 class="reveal-stamp__pitch">
-          <span class="zh">给它一张妆面，<br/>它<mark>反编译</mark>出能在你脸上复刻的<u>笔触</u>。</span>
-          <span class="en">Give it a look.<br/>It <mark>decompiles</mark> the <u>brushstrokes</u> your hands can replay.</span>
-        </h2>
-      </div>
+      <h2 class="mot__head"><span class="mot__head-a">If a hundred looks are saved,</span><br/><span class="mot__head-b">but none can be learned&hellip;</span></h2>
+      <div class="mot__gallery" id="mot-gallery"></div>
+      <div class="mot__credit mono">Effect by 美图秀秀 · 美容 · 美妆 · [柔纱芭蕾] / [小猫眼] / [古风]</div>
+      <div class="mot__credit mono">Datasets from ACM 2018 paper BeautyGAN&rsquo;s open makeup_dataset</div>
     </div>
   </section>
 
-  <!-- =========================================================== -->
-  <!-- RESULTS — 3 LOOKS, 3 TUTORIALS                                -->
-  <!-- =========================================================== -->
+  <!-- ============================================================ -->
+  <!-- ─ T · APPROACH AT A GLANCE  (deferred — placeholder)           -->
+  <!-- ============================================================ -->
+  <section id="teaser" class="section section--teaser">
+    <div class="container">
+      <h2 class="teaser__head">GMR now has it:</h2>
+      <p class="teaser__sub">Palette and strokes, computed and fully displayed:</p>
+      <div class="teaser__show" id="teaser-show"></div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- §1 · RESULTS                                                   -->
+  <!-- ============================================================ -->
   <section id="results" class="section section--results">
     <div class="container">
-      <div class="kicker mono">[ 01 · <span class="zh">结果先看</span><span class="en">Results first</span> ]</div>
-
+      <div class="kicker mono">[ § 1 ]</div>
       <h2 class="section__title">
-        <span class="zh">那三张妆面 →<br/>每一张都<em>有了一份妆教</em>。</span>
-        <span class="en">Those three looks →<br/>each now <em>comes with a tutorial</em>.</span>
+        <span class="zh">结果</span>
+        <span class="en">Results</span>
       </h2>
 
+      <!-- 1.1  Qualitative — showcase B -->
+      <h3 class="subsection__title">
+        <span class="zh">1.1   定性结果 · 主对象</span>
+        <span class="en">1.1   Qualitative Results · showcase subject</span>
+      </h3>
+
       <p class="lead">
-        <span class="zh">同一套数学，三种风格，三份按你脸型生成的<mark>笔触序列</mark>。每一笔都对应你手上要做的一件事。</span>
-        <span class="en">Same math, three styles, three <mark>brushstroke sequences</mark> targeted at your own face. Each stroke = one thing your hand actually does.</span>
+        <span class="zh">下方网格展示 GMR 在主对象 (showcase B) 上对三种风格强度的妆面 (M1 / M2 / M3) 的完整反编译输出。每行对应一个输入 Mi，每列对应 pipeline 输出的一类产物：从原始输入到分区边界、GMM palette、修剪后 palette、stroke regions、复演 MP4、重建合成、原图对比，到末尾 RMSE。</span>
+        <span class="en">The grid below shows GMR's full decomposition outputs on the showcase subject across three style intensities (M1 / M2 / M3). Each row corresponds to one input Mi; each column is one artefact emitted by the pipeline — from input through region boundaries, GMM palette, trimmed palette, stroke regions, replay MP4, reconstruction composite, original comparison, to per-look RMSE.</span>
       </p>
 
-      <div class="result-strip">
-        <div class="result-strip__head">
-          <div class="result-strip__tag mono">M1 · <span class="zh">日杂</span><span class="en">clean</span></div>
-          <div class="result-strip__count mono">06 strokes</div>
-        </div>
-        <div class="result-strip__frames">
-          <div class="frame placeholder"><span class="mono">B</span></div>
-          <div class="frame placeholder"><span class="mono">笔 01</span></div>
-          <div class="frame placeholder"><span class="mono">笔 02</span></div>
-          <div class="frame placeholder"><span class="mono">笔 03</span></div>
-          <div class="frame placeholder"><span class="mono">笔 04</span></div>
-          <div class="frame placeholder"><span class="mono">笔 05</span></div>
-          <div class="frame placeholder frame--final"><span class="mono">M1 ✓</span></div>
+      <div id="showcase-grid" class="results-grid" data-role="showcase">
+        <div class="results-grid__loading mono">
+          <span class="zh">从 manifest.json 加载主对象数据 …</span>
+          <span class="en">loading showcase from manifest.json …</span>
         </div>
       </div>
 
-      <div class="result-strip">
-        <div class="result-strip__head">
-          <div class="result-strip__tag mono">M2 · <span class="zh">港风</span><span class="en">HK retro</span></div>
-          <div class="result-strip__count mono">07 strokes</div>
-        </div>
-        <div class="result-strip__frames">
-          <div class="frame placeholder"><span class="mono">B</span></div>
-          <div class="frame placeholder"><span class="mono">笔 01</span></div>
-          <div class="frame placeholder"><span class="mono">笔 02</span></div>
-          <div class="frame placeholder"><span class="mono">笔 03</span></div>
-          <div class="frame placeholder"><span class="mono">笔 04</span></div>
-          <div class="frame placeholder"><span class="mono">笔 05</span></div>
-          <div class="frame placeholder"><span class="mono">笔 06</span></div>
-          <div class="frame placeholder frame--final"><span class="mono">M2 ✓</span></div>
-        </div>
-      </div>
-
-      <div class="result-strip">
-        <div class="result-strip__head">
-          <div class="result-strip__tag mono">M3 · <span class="zh">韩系挂雾</span><span class="en">K-soft</span></div>
-          <div class="result-strip__count mono">05 strokes</div>
-        </div>
-        <div class="result-strip__frames">
-          <div class="frame placeholder"><span class="mono">B</span></div>
-          <div class="frame placeholder"><span class="mono">笔 01</span></div>
-          <div class="frame placeholder"><span class="mono">笔 02</span></div>
-          <div class="frame placeholder"><span class="mono">笔 03</span></div>
-          <div class="frame placeholder"><span class="mono">笔 04</span></div>
-          <div class="frame placeholder frame--final"><span class="mono">M3 ✓</span></div>
-        </div>
-      </div>
-
-      <p class="muted mono results__caption">
-        <span class="zh">▲ 每一格 = 一笔反编译后的中间妆面。你照着它，从素颜走到目标。</span>
-        <span class="en">▲ Each cell = one decompiled intermediate. You follow them, from bare to target.</span>
+      <!-- 1.1'  Gallery -->
+      <h3 class="subsection__title">
+        <span class="zh">1.1′   定性结果 · 画廊</span>
+        <span class="en">1.1′   Qualitative Results · gallery</span>
+      </h3>
+      <p class="lead">
+        <span class="zh">同一条 pipeline 在 BeautyGAN 数据集中数张其他 subject 上的输出。点击任一卡片展开其完整十列网格。</span>
+        <span class="en">The same pipeline applied to additional subjects from the BeautyGAN dataset. Click any card to expand its full ten-column grid in place.</span>
       </p>
+      <div id="gallery-strip" class="gallery-strip" data-role="gallery">
+        <div class="gallery-strip__loading mono">
+          <span class="zh">从 manifest.json 加载画廊 …</span>
+          <span class="en">loading gallery from manifest.json …</span>
+        </div>
+      </div>
 
-      <div class="results__cta">
-        <a href="#method" class="btn btn--primary">
-          <span class="zh">看 MUA 怎么反编译 →</span>
-          <span class="en">See how MUA decompiles →</span>
-        </a>
-        <a href="#about" class="btn btn--ghost">
-          <span class="zh">想一起把它做大？</span>
-          <span class="en">Want to build this with me?</span>
-        </a>
+      <!-- 1.2  Quantitative -->
+      <h3 class="subsection__title">
+        <span class="zh">1.2   定量结果</span>
+        <span class="en">1.2   Quantitative Results</span>
+      </h3>
+      <p class="lead">
+        <span class="zh">表 1 在 GMR(p=0.70, N=6) 配置下报告相对于输入 M 的重建 RMSE。RMSE 仅在 mask 内部统计，按 0–255 标度给出。</span>
+        <span class="en">Table 1 reports reconstruction RMSE against input M under the GMR(p=0.70, N=6) configuration. RMSE is computed on the inside-mask region only, on the 0–255 scale.</span>
+      </p>
+      <div id="rmse-table" class="rmse-table" data-role="rmse">
+        <div class="rmse-table__loading mono">
+          <span class="zh">从 rmse_table.json 加载 …</span>
+          <span class="en">loading from rmse_table.json …</span>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- =========================================================== -->
-  <!-- METHOD — 反编译三步                                           -->
-  <!-- =========================================================== -->
+  <!-- ============================================================ -->
+  <!-- §2 · METHOD                                                    -->
+  <!-- ============================================================ -->
   <section id="method" class="section section--method">
     <div class="container">
-      <div class="kicker mono">[ 02 · <span class="zh">反编译三步</span><span class="en">The Decompile Pass</span> ]</div>
-
+      <div class="kicker mono">[ § 2 ]</div>
       <h2 class="section__title">
-        <span class="zh">一张妆面 → 三步 → 一份妆教。</span>
-        <span class="en">One look. Three passes. A tutorial.</span>
+        <span class="zh">方法</span>
+        <span class="en">Method</span>
       </h2>
 
       <p class="lead">
-        <span class="zh">这套流程<u>我目前的想法是这样</u>——欢迎挑刺。三步都可独立替换，整个 pipeline 是<mark>可重组的</mark>。</span>
-        <span class="en">This is <u>my current take</u> — push back if you see better. Each pass is swappable; the whole pipeline is <mark>recomposable</mark>.</span>
+        <span class="zh">GMR pipeline 包含五个阶段：颜料层抽取（§2.1）、分区分配（§2.2）、高斯混合解构（§2.3）、palette 修剪（§2.4）、与 brushstroke 复演（§2.5）。其中 §2.3 与 §2.5 为本工作的主要技术贡献。图 2 给出 pipeline 数据流图。</span>
+        <span class="en">The GMR pipeline comprises five stages: pigment-layer extraction (§2.1), region assignment (§2.2), Gaussian-mixture decomposition (§2.3), palette trim (§2.4), and brushstroke replay (§2.5). §2.3 and §2.5 are the principal technical contributions of this work. Figure 2 illustrates the data flow.</span>
       </p>
 
-      <div class="acts">
-        <article class="act">
-          <div class="act__num mono">PASS 01</div>
-          <h3 class="act__title">
-            <span class="zh">抽取 · Peel</span>
-            <span class="en">Peel</span>
-          </h3>
-          <p>
-            <span class="zh">从素颜 <code>B</code> 与上妆 <code>M</code> 中分离出<u>纯妆面层</u> <code>D</code>。</span>
-            <span class="en">From bare <code>B</code> and made-up <code>M</code>, isolate the <u>pure pigment layer</u> <code>D</code>.</span>
-          </p>
-          <div class="act__formula">
-            <code>D = (M − B·p) / (1−p)</code>
-          </div>
-          <div class="act__visual placeholder">
-            <span class="mono">[ B → D ghost layer ]</span>
-          </div>
-        </article>
-
-        <article class="act">
-          <div class="act__num mono">PASS 02</div>
-          <h3 class="act__title">
-            <span class="zh">解构 · Decompose</span>
-            <span class="en">Decompose</span>
-          </h3>
-          <p>
-            <span class="zh">把 <code>D</code> 拆成 N 个<u>基础颜料色</u> + 每个颜料在面部的分布图。</span>
-            <span class="en">Decompose <code>D</code> into N <u>base pigments</u> + each pigment&rsquo;s spatial map on the face.</span>
-          </p>
-          <div class="palette-strip">
-            <span class="swatch" style="background:#C2185B"></span>
-            <span class="swatch" style="background:#D4A89A"></span>
-            <span class="swatch" style="background:#8B5A3C"></span>
-            <span class="swatch" style="background:#6B4423"></span>
-            <span class="swatch" style="background:#F4C2C2"></span>
-            <span class="swatch" style="background:#1A0E08"></span>
-          </div>
-          <div class="act__visual placeholder">
-            <span class="mono">[ alpha maps · K=6 ]</span>
-          </div>
-        </article>
-
-        <article class="act act--featured">
-          <div class="act__num mono">PASS 03 ✦</div>
-          <h3 class="act__title">
-            <span class="zh">复刻 · Replay</span>
-            <span class="en">Replay</span>
-          </h3>
-          <p>
-            <span class="zh">用 Porter-Duff 合成把颜料按顺序叠回素颜——<mark>每一笔对应你手上的一件事</mark>。</span>
-            <span class="en">Use Porter-Duff compositing to stack pigments back over bare skin — <mark>one brushstroke = one thing your hand does</mark>.</span>
-          </p>
-
-          <!-- Stroke scrubber -->
-          <div class="scrubber">
-            <div class="scrubber__stage placeholder">
-              <span class="mono" id="scrubLabel">STROKE 00 / 06 — bare</span>
-            </div>
-            <input type="range" min="0" max="6" value="0" step="1" id="scrubInput" class="scrubber__input" aria-label="Stroke" />
-            <div class="scrubber__ticks mono">
-              <span>0 · bare</span>
-              <span>1 · base</span>
-              <span>2 · brow</span>
-              <span>3 · eye</span>
-              <span>4 · cheek</span>
-              <span>5 · lip</span>
-              <span>6 · final</span>
-            </div>
-          </div>
-          <p class="act__caption mono">
-            <span class="zh">▲ 拖动滑块——这就是输出的"妆教"</span>
-            <span class="en">▲ Drag the slider — this IS the generated tutorial</span>
-          </p>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- =========================================================== -->
-  <!-- REGION INTELLIGENCE                                           -->
-  <!-- =========================================================== -->
-  <section id="region" class="section section--region">
-    <div class="container container--narrow">
-      <div class="kicker mono">[ 03 · <span class="zh">分区</span><span class="en">Region</span> ]</div>
-
-      <h2 class="section__title">
-        <span class="zh">不是给像素上色，<br/>是给<em>嘴唇</em>上色。</span>
-        <span class="en">Don&rsquo;t color pixels.<br/>Color <em>lips</em>.</span>
-      </h2>
-
-      <p class="lead">
-        <span class="zh">脸先被切成有名字的区域（唇 / 眼 / 颊 / 鼻 / ...），再做颜料解构。妆教因此能<mark>说"在嘴唇上点玫瑰色"</mark>，而不是"在某团像素上涂颜色"。</span>
-        <span class="en">The face is first cut into named regions (lips / eyes / cheek / nose / ...) before any color decomposition. That&rsquo;s why a stroke can <mark>say &ldquo;dab rose on lips&rdquo;</mark>, not &ldquo;color this blob of pixels&rdquo;.</span>
-      </p>
-
-      <div class="region-demo">
-        <div class="region-demo__face placeholder">
-          <span class="mono">[ face with region overlay ]</span>
+      <figure class="method-figure">
+        <div class="method-figure__media placeholder">
+          <span class="mono">[ Figure 2 — pipeline diagram · placeholder ]</span>
         </div>
-        <ul class="region-demo__legend mono">
-          <li><span class="dot" style="background:#C2185B"></span>lips</li>
-          <li><span class="dot" style="background:#6B4423"></span>brows</li>
-          <li><span class="dot" style="background:#1A0E08"></span>eyes</li>
-          <li><span class="dot" style="background:#D4A89A"></span>cheek</li>
-          <li><span class="dot" style="background:#8B5A3C"></span>nose</li>
-          <li><span class="dot" style="background:#F4C2C2"></span>perioral</li>
-        </ul>
+        <figcaption class="mono">
+          <span class="zh">图 2. B + M → Peel → D → Segment → 分区掩码 → Decompose → palette + α-maps → Trim → 修剪后 palette → Replay → 有序 brushstroke + 重建。</span>
+          <span class="en">Figure 2. B + M → Peel → D → Segment → region masks → Decompose → palette + α-maps → Trim → trimmed palette → Replay → ordered brushstrokes + reconstruction.</span>
+        </figcaption>
+      </figure>
+
+      <!-- §2.1  Peel -->
+      <div class="method-sub" id="m21">
+        <h3 class="subsection__title">
+          <span class="zh">2.1   Peel · 颜料层抽取</span>
+          <span class="en">2.1   Peel — pigment layer extraction</span>
+        </h3>
+        <p>
+          <span class="zh">我们将上妆图像 <code>M</code> 建模为素颜 <code>B</code> 与妆面层 <code>D</code> 的线性混合，<code>p ∈ [0, 1]</code> 表示裸肤可见比例。可推导得到 <code>D</code> 的闭式反解（详见 §4.1）。本工作固定 <code>p = 0.70</code>。对眼线、修容等深色妆品，<code>D</code> 出现负值；signed-D 变体保留该负值供下游可视化使用。</span>
+          <span class="en">We model the made-up image <code>M</code> as a linear mixture of bare skin <code>B</code> and a cosmetic layer <code>D</code>, with <code>p ∈ [0, 1]</code> the visible bare-skin fraction. Solving for <code>D</code> yields a closed-form first-order inverse (§4.1). We fix <code>p = 0.70</code>. For dark cosmetics (eyeliner, contour), <code>D</code> contains negative entries; the signed-D variant retains them for downstream visualisation.</span>
+        </p>
+        <figure class="method-figure method-figure--small">
+          <div class="method-figure__media placeholder">
+            <span class="mono">[ Figure 2.1 — B + M → D ghost · placeholder ]</span>
+          </div>
+        </figure>
       </div>
 
-      <p class="muted mono">
-        <span class="zh">基于 MediaPipe 468 关键点 → 凸包多边形 → 优先级裁剪，得到不重叠的分区。</span>
-        <span class="en">MediaPipe&rsquo;s 468 landmarks → convex-hull polygons → priority-based pixel claiming for non-overlapping regions.</span>
-      </p>
+      <!-- §2.2  Segment -->
+      <div class="method-sub" id="m22">
+        <h3 class="subsection__title">
+          <span class="zh">2.2   Segment · 分区分配</span>
+          <span class="en">2.2   Segment — region assignment</span>
+        </h3>
+        <p>
+          <span class="zh">面部分区由 MediaPipe 提供的 468 关键点构造。每个区域为一组关键点上的凸包多边形；区域间重叠通过优先级 pixel-claiming 解决——优先级靠前的区域先认领像素，剩余像素留给后续区域。当前定义十一个不重叠区域：唇、鼻、唇周、左/右眉、左/右眼、左/右面中、左/右颊。</span>
+          <span class="en">Face regions are derived from MediaPipe's 468 facial landmarks. Each region is defined as a convex-hull polygon over a fixed landmark set; overlaps between regions are resolved by priority claiming — earlier-priority regions claim contested pixels first, later ones receive the remainder. Eleven non-overlapping regions are currently defined: lips, nose, perioral, left/right brows, left/right eyes, left/right midface, left/right cheek.</span>
+        </p>
+        <p>
+          <span class="zh">关键点到区域边界的映射并非算法决定，而是设计决策。图 2.2a 是记录这些决策的手绘草图；图 2.2b 显示该设计在真实输入上经优先级裁剪后的落地结果。</span>
+          <span class="en">The mapping from landmarks to region boundaries is design judgment, not algorithm. Figure 2.2a is the hand-drawn sketch recording those decisions; Figure 2.2b shows how the design lands on a real input after priority claiming.</span>
+        </p>
+        <figure class="method-figure method-figure--row">
+          <div class="method-figure__cell">
+            <img src="assets/static/region_handdrawn.png" alt="Hand-drawn region split sketch" />
+            <div class="caption mono">
+              <span class="zh">图 2.2a · 手绘分区设计</span>
+              <span class="en">Figure 2.2a · hand-drawn region split</span>
+            </div>
+          </div>
+          <div class="method-figure__cell">
+            <div class="method-figure__media placeholder placeholder--square">
+              <span class="mono">[ Figure 2.2b — placeholder · auto-populated from showcase M_bnd ]</span>
+            </div>
+            <div class="caption mono">
+              <span class="zh">图 2.2b · M 上的分区边界（来自 showcase）</span>
+              <span class="en">Figure 2.2b · region boundaries on M (from showcase)</span>
+            </div>
+          </div>
+        </figure>
+      </div>
+
+      <!-- §2.3  Decompose -->
+      <div class="method-sub method-sub--tier1" id="m23">
+        <h3 class="subsection__title">
+          <span class="zh">2.3   Decompose · 高斯混合解构</span>
+          <span class="en">2.3   Decompose — Gaussian-mixture decomposition</span>
+        </h3>
+        <p>
+          <span class="zh">在每个区域内，我们在 RGB 空间对 <code>{D(x,y)}</code> 拟合 K 分量高斯混合模型，逐像素得到各分量的软后验 <code>α_k(x,y)</code> 与分量均值 <code>{c_k}</code>。分量均值构成该区域的色号 palette；软后验构成每个色号的空间权重图。每区域 K 值由配置给出（K = 6 为默认；唇/眼等高色彩区域可单独提高）。</span>
+          <span class="en">Within each region, we fit a K-component Gaussian mixture to <code>{D(x,y)}</code> in RGB space, recovering soft posteriors <code>α_k(x,y)</code> and component means <code>{c_k}</code> per pixel. The means form the per-region shade palette; the posteriors give per-shade weight maps. K is configurable per region (K = 6 default; lip / eye regions may use higher K).</span>
+        </p>
+        <p>
+          <span class="zh">我们选择 GMM 而非 k-means，因为下游 convex-combination 求解器依赖 α 空间的平滑插值。k-means 输出硬分配；经单纯形投影后，扩展的像素邻域会塌缩到单一 palette 顶点上，在 cluster 边界处产生可见的块状伪影。GMM 的连续后验恢复了该梯度，消除此伪影。GMM temperature 控制后验的锐度；其敏感性扫描列入 §6 Future Work。</span>
+          <span class="en">GMM is chosen over k-means because the downstream convex-combination solver relies on smooth interpolation in α-space. K-means produces hard assignments; after simplex projection, extended pixel neighbourhoods collapse onto single palette vertices, producing visible block artefacts at cluster boundaries. GMM's continuous posteriors recover the gradient and eliminate this artefact. The GMM temperature controls posterior sharpness; sensitivity sweep is flagged in §6 Future Work.</span>
+        </p>
+        <figure class="method-figure">
+          <div class="method-figure__media placeholder">
+            <span class="mono">[ Figure 2.3 — per-region GMM palette · placeholder ]</span>
+          </div>
+          <figcaption class="mono">
+            <span class="zh">图 2.3 · 每区域 GMM 输出色号集合，按区域纵向排列。</span>
+            <span class="en">Figure 2.3 · per-region GMM palette, laid out vertically with one row per region.</span>
+          </figcaption>
+        </figure>
+      </div>
+
+      <!-- §2.4  Trim -->
+      <div class="method-sub" id="m24">
+        <h3 class="subsection__title">
+          <span class="zh">2.4   Trim · palette 修剪</span>
+          <span class="en">2.4   Trim — palette trim</span>
+        </h3>
+        <p>
+          <span class="zh">原始 GMM palette 在进入复演前经过两步处理。<strong>(i) 打底色重排：</strong>在每个区域内将与该区域 bare-skin 均值在 RGB 上最接近的色号移至位置 0，使复演序列以"上底色"开始——这与人类化妆顺序一致，并为后续 stroke 提供基底参考。<strong>(ii) 可替代性分类：</strong>对每个色号检查能否被其余色号以非负线性组合在 <code>ΔE_2000</code> 容差内重构；可被重构的色号标记为 REPLACE，其余标记为 KEEP。REPLACE 色号在 §1 Results 的 <em>merged palette</em> 列以红色 ✕ 标出。</span>
+          <span class="en">The raw GMM palette is processed in two steps before replay. <strong>(i) 打底色 reorder:</strong> within each region, the shade closest in RGB to the region's bare-skin mean is moved to position 0, so the replay begins with a base-tone application — matching how a human applies makeup and grounding the subsequent strokes. <strong>(ii) Replaceability classification:</strong> each shade is checked against whether it can be reconstructed as a non-negative combination of the others within a <code>ΔE_2000</code> tolerance; reconstructable shades are marked REPLACE, the rest KEEP. REPLACE entries are marked with a red ✕ in the <em>merged palette</em> column of §1 Results.</span>
+        </p>
+        <p>
+          <span class="zh">当前 bare-skin proxy 取为 <code>B</code> 在该区域 mask 内的均值——粗略，且包含 <code>B</code> 在该区域内任何残留妆品和边界像素的影响。更干净的代理留作 Future Work（§6）。跨区域 palette 合并目前未启用。</span>
+          <span class="en">The bare-skin proxy is the mean of <code>B</code> inside the region mask — crude, and contaminated by residual makeup in <code>B</code> and boundary pixels. A cleaner proxy is deferred to Future Work (§6). Cross-region palette merging is not currently applied.</span>
+        </p>
+        <figure class="method-figure">
+          <div class="method-figure__media placeholder">
+            <span class="mono">[ Figure 2.4 — palette before / after trim · placeholder ]</span>
+          </div>
+          <figcaption class="mono">
+            <span class="zh">图 2.4 · 修剪前后的 palette 对照（左：GMM 原始；右：打底色重排 + REPLACE 色号标红 ✕）。</span>
+            <span class="en">Figure 2.4 · palette before and after trim (left: raw GMM; right: 打底色 moved to position 0 + REPLACE entries marked with red ✕).</span>
+          </figcaption>
+        </figure>
+      </div>
+
+      <!-- §2.5  Replay -->
+      <div class="method-sub method-sub--tier1" id="m25">
+        <h3 class="subsection__title">
+          <span class="zh">2.5   Replay · brushstroke 复演</span>
+          <span class="en">2.5   Replay — brushstroke replay</span>
+        </h3>
+        <p>
+          <span class="zh">给定修剪后的 palette <code>{c_k}</code> 与后验 <code>α_k</code>，step generator 通过 Porter-Duff 累积合成生成有序帧序列 <code>E_0, …, E_N</code>。直接以 <code>α_k</code> 作为每步可见覆盖率会让最终帧偏离目标——正确的每步覆盖率 <code>λ_k</code> 是 <code>α_k</code> 除以"该笔及之后所有层的残余贡献"。该推导（详见 §4.3）保证 <code>E_N = M</code> 在数学上严格相等。</span>
+          <span class="en">Given the trimmed palette <code>{c_k}</code> and posteriors <code>α_k</code>, the step generator synthesises an ordered sequence of frames <code>E_0, …, E_N</code> via Porter-Duff cumulative compositing. Using <code>α_k</code> directly as per-step coverage drifts the final frame off-target — the correct visible coverage <code>λ_k</code> is <code>α_k</code> divided by the residual contribution of all later layers. The derivation (§4.3) guarantees <code>E_N = M</code> exactly.</span>
+        </p>
+        <p>
+          <span class="zh">MP4 可视化使用 KEEP-mode α 重分布：被分类为 REPLACE 的色号其 α 质量按非负线性方案分配到对应的 KEEP 色号上，使动画的每一帧对应一支必要产品的覆盖，而非 GMM 原始分量。该可视化将 brushstroke 的隐式离散性显式化。</span>
+          <span class="en">The MP4 visualisation uses KEEP-mode α redistribution: α-mass from shades classified as REPLACE is allocated to their solution KEEPs by the same non-negative weights used in replaceability checking. Each animation frame therefore corresponds to one essential product, not one raw GMM component — making the implicit discreteness of brushstrokes explicit.</span>
+        </p>
+        <figure class="method-figure">
+          <div class="method-figure__media placeholder">
+            <span class="mono">[ Figure 2.5 — step MP4 from showcase · placeholder ]</span>
+          </div>
+          <figcaption class="mono">
+            <span class="zh">图 2.5 · 自 showcase 加载 KEEP-mode brushstroke 复演 MP4，自动播放循环。</span>
+            <span class="en">Figure 2.5 · KEEP-mode brushstroke replay MP4 from the showcase subject, autoplay loop.</span>
+          </figcaption>
+        </figure>
+      </div>
     </div>
   </section>
 
-  <!-- =========================================================== -->
-  <!-- MODULES                                                       -->
-  <!-- =========================================================== -->
-  <section id="modules" class="section section--modules">
-    <div class="container">
-      <div class="kicker mono">[ 04 · <span class="zh">四个模块</span><span class="en">Modules</span> ]</div>
-
+  <!-- ============================================================ -->
+  <!-- §3 · SYSTEM ARCHITECTURE                                       -->
+  <!-- ============================================================ -->
+  <section id="architecture" class="section section--architecture">
+    <div class="container container--narrow">
+      <div class="kicker mono">[ § 3 ]</div>
       <h2 class="section__title">
-        <span class="zh">四块砖。<br/><em>每一块都能拿出来单卖</em>。</span>
-        <span class="en">Four bricks.<br/><em>Any one ships standalone</em>.</span>
+        <span class="zh">系统架构</span>
+        <span class="en">System Architecture</span>
       </h2>
 
       <p class="lead">
-        <span class="zh">这不是一个黑盒——是<mark>四个互相解耦的模块</mark>。合在一起做妆教；拆出任意一个，都能在自己领域用。<u>如果你的项目用得到其中任一个，欢迎聊聊。</u></span>
-        <span class="en">Not a black box — <mark>four decoupled modules</mark>. Together they generate tutorials. Pulled apart, each holds value on its own. <u>If any one fits your project, let&rsquo;s talk.</u></span>
+        <span class="zh">GMR 由四个顺序模块组成，模块间接口固定。每个模块都可单独运行；任一模块的实现可被替换，不影响其他模块。Indicator 可视化作为诊断工具单独提供，不在主流水线上。</span>
+        <span class="en">GMR is structured as four sequential modules connected by fixed I/O contracts. Each module is independently runnable; any module's implementation may be replaced without modifying downstream consumers. Indicator visualisation is a diagnostic utility, not a load-bearing pipeline stage.</span>
       </p>
 
-      <div class="modules-grid">
+      <div class="arch-grid">
 
-        <article class="module-card">
-          <header class="module-card__head">
-            <div class="module-card__num mono">M / 01</div>
-            <h3>Peel</h3>
-          </header>
-          <div class="module-card__io mono">
+        <article class="arch-card">
+          <div class="arch-card__num mono">M / 01</div>
+          <h3 class="arch-card__name">Peel</h3>
+          <div class="arch-card__io mono">
             <div><span class="io-tag">IN</span> B, M</div>
             <div><span class="io-tag">OUT</span> D, mask</div>
           </div>
           <p>
-            <span class="zh">从素颜 / 上妆双图中分离纯颜料层。alpha 合成的闭式反演。</span>
-            <span class="en">Isolates the pure pigment layer from a bare / made-up pair. A closed-form inversion of alpha compositing.</span>
+            <span class="zh">α 合成的闭式反演，从素颜 / 上妆对中分离妆面层。</span>
+            <span class="en">Closed-form inversion of alpha compositing; isolates the cosmetic layer from a bare / made-up pair.</span>
           </p>
-          <div class="module-card__use mono">
-            <span class="zh">▸ 单独用：</span><span class="en">▸ Standalone:</span>
-            <span class="zh">皮肤医学比对、护肤前后量化、色彩科学。</span>
-            <span class="en">Dermatology before/after, skincare quantification, color science.</span>
-          </div>
+          <div class="arch-card__file mono">impl: core/peel.py</div>
         </article>
 
-        <article class="module-card">
-          <header class="module-card__head">
-            <div class="module-card__num mono">M / 02</div>
-            <h3>Segmentation</h3>
-          </header>
-          <div class="module-card__io mono">
+        <article class="arch-card">
+          <div class="arch-card__num mono">M / 02</div>
+          <h3 class="arch-card__name">Region-split</h3>
+          <div class="arch-card__io mono">
             <div><span class="io-tag">IN</span> face image</div>
             <div><span class="io-tag">OUT</span> region masks</div>
           </div>
           <p>
-            <span class="zh">由关键点构造的语义分区——不重叠、按优先级裁剪。比像素级 semseg 轻量、可解释。</span>
-            <span class="en">Landmark-driven semantic regions — non-overlapping, priority-claimed. Lighter and more interpretable than pixel-wise semseg.</span>
+            <span class="zh">基于关键点的语义分区——不重叠、按优先级裁剪。十一个区域。</span>
+            <span class="en">Landmark-driven semantic regions — non-overlapping, priority-claimed. Eleven regions.</span>
           </p>
-          <div class="module-card__use mono">
-            <span class="zh">▸ 单独用：</span><span class="en">▸ Standalone:</span>
-            <span class="zh">面部 AR 贴纸、区域美颜、皮肤分析。</span>
-            <span class="en">Face AR stickers, region-specific beauty filters, skin analysis.</span>
-          </div>
+          <div class="arch-card__file mono">impl: core/segmentation.py</div>
         </article>
 
-        <article class="module-card">
-          <header class="module-card__head">
-            <div class="module-card__num mono">M / 03</div>
-            <h3>Unmix</h3>
-          </header>
-          <div class="module-card__io mono">
-            <div><span class="io-tag">IN</span> D, N</div>
+        <article class="arch-card">
+          <div class="arch-card__num mono">M / 03</div>
+          <h3 class="arch-card__name">Decompose</h3>
+          <div class="arch-card__io mono">
+            <div><span class="io-tag">IN</span> D, K, region mask</div>
             <div><span class="io-tag">OUT</span> palette + α-maps</div>
           </div>
           <p>
-            <span class="zh">把任何颜料层解构成 N 个基础色 + 每个色的空间权重图。凸包 / GMM 两种实现。</span>
-            <span class="en">Decomposes any pigment layer into N base colors + per-color weight maps. Convex-hull and GMM variants.</span>
+            <span class="zh">每区域 GMM 拟合得到 N 个基础色号与软后验权重图。亦提供 TC-1 hull baseline 作为可选 backend。</span>
+            <span class="en">Per-region GMM fit yielding N base shades and soft posterior weight maps. A TC-1 hull baseline is also available as an alternative backend.</span>
           </p>
-          <div class="module-card__use mono">
-            <span class="zh">▸ 单独用：</span><span class="en">▸ Standalone:</span>
-            <span class="zh">品牌色匹配、绘画分析、油漆 / 印刷色复原。</span>
-            <span class="en">Brand color matching, painting analysis, paint / print color recovery.</span>
-          </div>
+          <div class="arch-card__file mono">impl: core/unmix.py</div>
         </article>
 
-        <article class="module-card">
-          <header class="module-card__head">
-            <div class="module-card__num mono">M / 04</div>
-            <h3>Stroke Generator</h3>
-          </header>
-          <div class="module-card__io mono">
-            <div><span class="io-tag">IN</span> B, palette, α-maps</div>
-            <div><span class="io-tag">OUT</span> ordered strokes</div>
+        <article class="arch-card">
+          <div class="arch-card__num mono">M / 04</div>
+          <h3 class="arch-card__name">Step Generator</h3>
+          <div class="arch-card__io mono">
+            <div><span class="io-tag">IN</span> B, palette, α-maps, p</div>
+            <div><span class="io-tag">OUT</span> ordered steps</div>
           </div>
           <p>
-            <span class="zh">把解构结果按 Porter-Duff 合成顺序叠回——每一笔对应一件化妆品的覆盖。</span>
-            <span class="en">Replays the decomposition via Porter-Duff compositing — each stroke = one cosmetic&rsquo;s coverage.</span>
+            <span class="zh">λ 修正的 Porter-Duff 累积合成，保证末帧严格等于 M。亦输出 KEEP-mode 可视化所需的离散指标。</span>
+            <span class="en">λ-corrected Porter-Duff cumulative compositing, guaranteeing E_N = M exactly. Also emits discrete indicators consumed by the KEEP-mode visualisation.</span>
           </p>
-          <div class="module-card__use mono">
-            <span class="zh">▸ 单独用：</span><span class="en">▸ Standalone:</span>
-            <span class="zh">任何分层教学：绘画、插画、设计教程合成。</span>
-            <span class="en">Any layered tutorial generation: painting, illustration, design.</span>
-          </div>
+          <div class="arch-card__file mono">impl: core/steps.py</div>
         </article>
 
       </div>
     </div>
   </section>
 
-  <!-- =========================================================== -->
-  <!-- MATH                                                          -->
-  <!-- =========================================================== -->
-  <section id="math" class="section section--math">
-    <div class="container">
-      <div class="kicker kicker--inv mono">[ 05 · <span class="zh">背后的数学</span><span class="en">The math behind it</span> ]</div>
-
+  <!-- ============================================================ -->
+  <!-- §4 · FORMULATION                                               -->
+  <!-- ============================================================ -->
+  <section id="formulation" class="section section--formulation">
+    <div class="container container--narrow">
+      <div class="kicker kicker--inv mono">[ § 4 ]</div>
       <h2 class="section__title section__title--inv">
-        <span class="zh">所有视觉效果，<br/>背后是<em>三个公式</em>。</span>
-        <span class="en">Everything visual<br/>collapses to <em>three equations</em>.</span>
+        <span class="zh">数学建模</span>
+        <span class="en">Formulation</span>
       </h2>
 
       <p class="lead lead--inv">
-        <span class="zh">写在这儿不是为了证明谁的智商——是<mark>欢迎被挑战、被改进、被替换</mark>。如果你看到更好的解法，我想听。</span>
-        <span class="en">Not here to flex — here to be <mark>challenged, improved, replaced</mark>. If you see a better solution, I want to hear it.</span>
+        <span class="zh">本节汇总在 §2 中引入的方程式以便引用。</span>
+        <span class="en">This section consolidates the equations introduced inline in §2.</span>
       </p>
 
-      <div class="math-block">
-        <div class="math-block__num mono">EQ / 01</div>
-        <h3 class="math-block__title">
-          <span class="zh">抽取方程 · Peel</span>
-          <span class="en">The Peel Equation</span>
+      <div class="eq-block">
+        <h3 class="eq-block__title">
+          <span class="zh">4.1   线性化的妆面混合模型</span>
+          <span class="en">4.1   Linear cosmetic mixing model</span>
         </h3>
-        <p>
-          <span class="zh">假设上妆图 <code>M</code> 是素颜 <code>B</code> 与妆面颜料 <code>D</code> 的线性混合，<code>p</code> 是裸肤可见比例：</span>
-          <span class="en">Assume the made-up image <code>M</code> is a linear mixture of bare skin <code>B</code> and pigment <code>D</code>, with <code>p</code> the visible bare-skin fraction:</span>
-        </p>
-        <div class="math-render">$$ M(x,y) = p \cdot B(x,y) + (1-p) \cdot D(x,y) $$</div>
-        <p>
-          <span class="zh">求解 <code>D</code>：</span>
-          <span class="en">Solving for <code>D</code>:</span>
-        </p>
-        <div class="math-render math-render--key">$$ D(x,y) = \frac{M(x,y) - p \cdot B(x,y)}{1 - p} $$</div>
-        <p class="muted mono">
-          <span class="zh">这是整个项目的<u>地基</u>——一个一阶可解的反问题。</span>
-          <span class="en">The <u>foundation</u> — a first-order, closed-form inverse.</span>
-        </p>
+        <div class="math-render">$$ M(x,y) \;=\; p \cdot B(x,y) \;+\; (1 - p) \cdot D(x,y) \tag{1} $$</div>
+        <div class="math-render">$$ D(x,y) \;=\; \frac{M(x,y) - p \cdot B(x,y)}{1 - p} \tag{2} $$</div>
       </div>
 
-      <div class="math-block">
-        <div class="math-block__num mono">EQ / 02</div>
-        <h3 class="math-block__title">
-          <span class="zh">凸组合解构 · Convex Decomposition</span>
-          <span class="en">Convex Decomposition</span>
+      <div class="eq-block">
+        <h3 class="eq-block__title">
+          <span class="zh">4.2   色号 palette 上的凸组合</span>
+          <span class="en">4.2   Convex combination over the shade palette</span>
         </h3>
-        <p>
-          <span class="zh">妆面层 <code>D</code> 的每个像素都建模为 N 个基础颜料色 <code>c_k</code> 的凸组合：</span>
-          <span class="en">Each pixel of <code>D</code> is modeled as a convex combination of N base pigments <code>c_k</code>:</span>
+        <p class="dim">
+          <span class="zh">对 <code>D</code> 的每个像素：</span>
+          <span class="en">For each pixel of <code>D</code>:</span>
         </p>
-        <div class="math-render">$$ D(x,y) \;=\; \sum_{k=1}^{N} \alpha_k(x,y) \cdot c_k, \quad \alpha_k \ge 0,\; \sum_k \alpha_k = 1 $$</div>
-        <p>
-          <span class="zh">调色板 <code>{c_k}</code> 取自像素 RGB 凸包顶点的<u>最远点采样</u>。每像素 <code>α</code> 通过单纯形约束最小二乘求解。</span>
-          <span class="en">The palette <code>{c_k}</code> comes from <u>farthest-point sampling</u> on the convex-hull vertices of pixel-RGB. Per-pixel <code>α</code> is solved via simplex-constrained least squares.</span>
-        </p>
+        <div class="math-render">$$ D(x,y) \;=\; \sum_{k=1}^{N} \alpha_k(x,y) \cdot c_k, \quad \alpha_k \ge 0,\; \textstyle\sum_k \alpha_k = 1 \tag{3} $$</div>
       </div>
 
-      <div class="math-block">
-        <div class="math-block__num mono">EQ / 03</div>
-        <h3 class="math-block__title">
-          <span class="zh">Porter-Duff 累积覆盖 · Stroke Compositing</span>
-          <span class="en">Porter-Duff Cumulative Coverage</span>
+      <div class="eq-block">
+        <h3 class="eq-block__title">
+          <span class="zh">4.3   Porter-Duff 累积覆盖</span>
+          <span class="en">4.3   Porter-Duff cumulative coverage</span>
         </h3>
-        <p>
-          <span class="zh">第 <code>k</code> 笔的可见覆盖率不是 <code>α_k</code> 本身——要除以"该笔及之后所有层的总贡献"，保证最终一笔后精确等于 M：</span>
-          <span class="en">Stroke <code>k</code>&rsquo;s visible coverage is not <code>α_k</code> itself — it must be divided by &ldquo;this and all later layers&rsquo; total contribution&rdquo; — so the final stroke equals M exactly:</span>
+        <p class="dim">
+          <span class="zh">记 <code>P_{k+1}</code> 为第 k+1 到 N 层的残余贡献：</span>
+          <span class="en">Let <code>P_{k+1}</code> denote the residual contribution of layers k+1 through N:</span>
         </p>
-        <div class="math-render">$$ P_{k+1} \;=\; 1 - (1-p)\cdot\!\!\!\sum_{j=k+1}^{N} \alpha_j(x,y) $$</div>
-        <div class="math-render math-render--key">$$ \lambda_k(x,y) \;=\; \frac{\alpha_k(x,y)\cdot(1-p)}{P_{k+1}} $$</div>
-        <div class="math-render">$$ E_k(x,y) \;=\; (1-\lambda_k)\cdot E_{k-1}(x,y) \;+\; \lambda_k \cdot c_k $$</div>
-        <p class="muted mono">
-          <span class="zh">λ 的推导是项目的<u>非平凡贡献</u>——直接用 α 做合成会让最终帧偏离 M。</span>
-          <span class="en">The λ derivation is the <u>non-trivial part</u> — naively using α drifts the final frame off-target.</span>
+        <div class="math-render">$$ P_{k+1}(x,y) \;=\; 1 \;-\; (1 - p) \cdot \!\!\sum_{j > k} \alpha_j(x,y) \tag{4} $$</div>
+        <div class="math-render">$$ \lambda_k(x,y) \;=\; \frac{\alpha_k(x,y) \cdot (1 - p)}{P_{k+1}(x,y)} \tag{5} $$</div>
+        <div class="math-render">$$ E_k(x,y) \;=\; (1 - \lambda_k) \cdot E_{k-1}(x,y) \;+\; \lambda_k \cdot c_k \tag{6} $$</div>
+        <p class="dim">
+          <span class="zh">(5) 中 <code>λ_k</code> 的推导保证 <code>E_N = M</code> 严格相等。若直接以 <code>α_k</code> 替代 <code>λ_k</code>，最终帧将偏离目标。</span>
+          <span class="en">The <code>λ_k</code> derivation in (5) ensures <code>E_N = M</code> exactly. Using <code>α_k</code> in place of <code>λ_k</code> drifts the final frame off-target.</span>
         </p>
       </div>
     </div>
   </section>
 
-  <!-- =========================================================== -->
-  <!-- LIMITATIONS                                                   -->
-  <!-- =========================================================== -->
-  <section id="limitations" class="section section--limits">
+  <!-- ============================================================ -->
+  <!-- §5 · LIMITATIONS                                               -->
+  <!-- ============================================================ -->
+  <section id="limitations" class="section section--limitations">
     <div class="container container--narrow">
-      <div class="kicker mono">[ 06 · <span class="zh">边界</span><span class="en">Edges</span> ]</div>
-
+      <div class="kicker mono">[ § 5 ]</div>
       <h2 class="section__title">
-        <span class="zh">做到的，<br/>还没做到的。</span>
-        <span class="en">What works.<br/>What I haven&rsquo;t cracked.</span>
+        <span class="zh">限制</span>
+        <span class="en">Limitations</span>
       </h2>
 
-      <p class="lead">
-        <span class="zh">没有一个真在迭代的系统是没有边界的。我把它们摆在这儿——<mark>不是缺点，是邀请你一起想下一步</mark>。</span>
-        <span class="en">No system that&rsquo;s actually being iterated has no edges. I&rsquo;m putting them here — <mark>not as caveats, but as invitations to think about what&rsquo;s next</mark>.</span>
-      </p>
-
-      <div class="limits-grid">
-        <article class="limit-card limit-card--works">
-          <div class="limit-card__tag mono">✓ <span class="zh">已跑通</span><span class="en">Works</span></div>
-          <h3>
-            <span class="zh">端到端 pipeline</span>
-            <span class="en">End-to-end pipeline</span>
-          </h3>
-          <p>
-            <span class="zh">p=70 / N=6 下，重建 RMSE ~2.9（0–255 满量程）。最后一笔与 M 数学上严格相等。</span>
-            <span class="en">At p=70 / N=6, reconstruction RMSE ~2.9 on a 0–255 scale. The final stroke equals M exactly.</span>
-          </p>
-        </article>
-
-        <article class="limit-card limit-card--works">
-          <div class="limit-card__tag mono">✓ <span class="zh">已跑通</span><span class="en">Works</span></div>
-          <h3>
-            <span class="zh">分区语义化妆教</span>
-            <span class="en">Region-aware tutorial</span>
-          </h3>
-          <p>
-            <span class="zh">基于 MediaPipe 468 点 + 优先级裁剪，可输出"在唇 / 眼周 / 脸颊"等具名指令。</span>
-            <span class="en">From MediaPipe&rsquo;s 468 landmarks + priority claiming, outputs named instructions: &ldquo;on lips / eyes / cheek …&rdquo;.</span>
-          </p>
-        </article>
-
-        <article class="limit-card limit-card--solving">
-          <div class="limit-card__tag mono">◐ <span class="zh">在做</span><span class="en">In progress</span></div>
-          <h3>
-            <span class="zh">深色颜料 (signed-D)</span>
-            <span class="en">Dark pigments (signed-D)</span>
-          </h3>
-          <p>
-            <span class="zh">眼线 / 修容产生<u>负向 D</u>，调色板会出现负色。显示公式已确认，待实现：<code>display = clip(skin + palette·255)</code>。</span>
-            <span class="en">Eyeliner / contour produce <u>negative D</u>; palette entries can go negative. Display formula agreed but not yet wired: <code>display = clip(skin + palette·255)</code>.</span>
-          </p>
-        </article>
-
-        <article class="limit-card limit-card--solving">
-          <div class="limit-card__tag mono">◐ <span class="zh">在做</span><span class="en">In progress</span></div>
-          <h3>
-            <span class="zh">K-means → GMM 迁移</span>
-            <span class="en">K-means → GMM migration</span>
-          </h3>
-          <p>
-            <span class="zh">发现 K-means 调色板会让单纯形投影产生<u>块状伪影</u>。已切到 GMM 软后验，明显更平滑。</span>
-            <span class="en">K-means palette caused <u>blocky artifacts</u> from piecewise-constant simplex projection. Switched to GMM soft posteriors — visibly smoother.</span>
-          </p>
-        </article>
-
-        <article class="limit-card limit-card--open">
-          <div class="limit-card__tag mono">◯ <span class="zh">开放</span><span class="en">Open</span></div>
-          <h3>
-            <span class="zh">感知损失函数</span>
-            <span class="en">Perceptual loss</span>
-          </h3>
-          <p>
-            <span class="zh">当前 RGB L2 把色相与亮度<u>等权处理</u>。人眼对亮度更敏感——计划迁到 Lab / 加权 RGB。<mark>有更好的方案欢迎指点</mark>。</span>
-            <span class="en">Current L2 in RGB weighs hue and brightness <u>equally</u>. The eye is more sensitive to brightness — planning a move to Lab or weighted RGB. <mark>Better ideas welcome</mark>.</span>
-          </p>
-        </article>
-
-        <article class="limit-card limit-card--open">
-          <div class="limit-card__tag mono">◯ <span class="zh">开放</span><span class="en">Open</span></div>
-          <h3>
-            <span class="zh">调色板 ≠ 真实颜料</span>
-            <span class="en">Palette ≠ true pigments</span>
-          </h3>
-          <p>
-            <span class="zh">所有像素本身就是<u>混合物</u>，凸包顶点是最极端的混合色，不是品牌方的纯颜料。<mark>这是一个会影响商业化的根本约束——我也在想该怎么破</mark>。</span>
-            <span class="en">All pixels are <u>already mixtures</u>; hull vertices are the most extreme mixtures, not real brand pigments. <mark>A structural constraint for commercialization — I&rsquo;m still thinking about how to break it</mark>.</span>
-          </p>
-        </article>
-      </div>
+      <ol class="limit-list">
+        <li>
+          <strong class="limit-list__head">
+            <span class="zh">5.1   色号与真实颜料的等同性</span>
+            <span class="en">5.1   Shade-vs-pigment identity</span>
+          </strong>
+          <span class="zh">抽取得到的 palette 是输入中观察到的极端混合色，不是品牌方真实的纯颜料。由于所有像素本身就是混合体，真实纯颜料可能位于数据凸包之外。</span>
+          <span class="en">The extracted palette consists of the most extreme mixtures observed in the input, not the underlying brand pigments. As all observed pixels are themselves mixtures, the true pure pigments may lie outside the data hull.</span>
+        </li>
+        <li>
+          <strong class="limit-list__head">
+            <span class="zh">5.2   少数高饱和度模式的稀释</span>
+            <span class="en">5.2   Minority-mode dilution</span>
+          </strong>
+          <span class="zh">小区域内的强饱和色（如局部唇釉峰值、眼线浓彩）有时被吸收入相邻的主导色号中，重建结果偏淡、偏向全局色——根因是 EM 优化对面积加权的对数似然，小但显著的色峰在该目标下贡献不足以分到独立分量。</span>
+          <span class="en">Small regions of strongly saturated colour (concentrated lip tint, eyeliner accent) are sometimes absorbed into the nearest dominant component, producing washed-out reconstructions that drift toward the global tone. The cause is structural: EM maximises area-weighted log-likelihood, which under-rewards a small but distinct peak compared to spending the same component on a larger dominant cluster.</span>
+        </li>
+        <li>
+          <strong class="limit-list__head">
+            <span class="zh">5.3   Signed-D 处理</span>
+            <span class="en">5.3   Signed-D handling</span>
+          </strong>
+          <span class="zh">深色妆品产生 <code>D</code> 中的负值与 palette 中的负色项。当前显示约定 <code>display = clip(skin + palette·255, 0, 255)</code> 在数学上自洽，但尚未在更大规模上验证。</span>
+          <span class="en">Dark cosmetics produce negative entries in <code>D</code> and consequently negative palette entries. The current display convention <code>display = clip(skin + palette·255, 0, 255)</code> is consistent but unverified at scale.</span>
+        </li>
+        <li>
+          <strong class="limit-list__head">
+            <span class="zh">5.4   RGB 空间损失</span>
+            <span class="en">5.4   RGB-space loss</span>
+          </strong>
+          <span class="zh">当前在 RGB 空间使用未加权 L2 损失，对色相与亮度的偏差等权处理；这与人眼感知距离存在已知差异。</span>
+          <span class="en">An unweighted L2 loss in RGB treats hue and brightness deviations equivalently, which is known to differ from human perceptual distance.</span>
+        </li>
+        <li>
+          <strong class="limit-list__head">
+            <span class="zh">5.5   超参数覆盖</span>
+            <span class="en">5.5   Hyperparameter coverage</span>
+          </strong>
+          <span class="zh">GMM temperature、K、p 的完整扫描尚未完成；当前结果在一组固定值上报告。</span>
+          <span class="en">A full sweep over GMM temperature, K, and p has not yet been completed; current results are reported under a single fixed configuration.</span>
+        </li>
+        <li>
+          <strong class="limit-list__head">
+            <span class="zh">5.6   姿态匹配</span>
+            <span class="en">5.6   Pose alignment</span>
+          </strong>
+          <span class="zh">B 与 M 需大致对齐；显著的姿态差异目前不被处理。</span>
+          <span class="en">B and M must be approximately aligned; significant pose differences are not currently handled.</span>
+        </li>
+      </ol>
     </div>
   </section>
 
-  <!-- =========================================================== -->
-  <!-- VISION                                                        -->
-  <!-- =========================================================== -->
-  <section id="vision" class="section section--vision">
-    <div class="container">
-      <div class="kicker mono">[ 07 · <span class="zh">商业愿景</span><span class="en">Vision</span> ]</div>
-
-      <h2 class="section__title">
-        <span class="zh">两条腿走路，<br/>中间是一只<em>飞轮</em>。</span>
-        <span class="en">Two legs.<br/>One <em>flywheel</em> in between.</span>
-      </h2>
-
-      <p class="lead">
-        <span class="zh">这是我目前能想到的最直接的路径——<mark>很可能不是最优解</mark>。如果你看美妆 / AIGC / 工具型 AI 的赛道，<u>我想跟你换换思路</u>。</span>
-        <span class="en">This is the most direct path I can currently see — <mark>almost certainly not the optimal one</mark>. If you watch beauty / AIGC / AI-native tools, <u>I&rsquo;d like to trade notes</u>.</span>
-      </p>
-
-      <div class="vision-grid">
-        <article class="vision-card">
-          <div class="vision-card__tag mono">B2C</div>
-          <h3>
-            <span class="zh">微信小程序</span>
-            <span class="en">WeChat Mini-Program</span>
-          </h3>
-          <p>
-            <span class="zh">用户传一张妆面，得到<mark>专属于自己脸的妆教</mark>。低门槛、即开即用、社交传播。</span>
-            <span class="en">Users upload a look, get a tutorial <mark>personalized to their own face</mark>. Low-friction, instant, socially shareable.</span>
-          </p>
-        </article>
-
-        <article class="vision-card">
-          <div class="vision-card__tag mono">B2B</div>
-          <h3>
-            <span class="zh">品牌内容引擎</span>
-            <span class="en">Brand content engine</span>
-          </h3>
-          <p>
-            <span class="zh">化妆品品牌按产品图 + 模特脸<mark>批量生成妆教</mark>，自动覆盖小红书 / 抖音内容生产。</span>
-            <span class="en">Cosmetic brands <mark>generate tutorial content at scale</mark> from product shots + model faces.</span>
-          </p>
-        </article>
-
-        <article class="vision-card vision-card--featured">
-          <div class="vision-card__tag mono">FLYWHEEL ✦</div>
-          <h3>
-            <span class="zh">数据飞轮</span>
-            <span class="en">Data flywheel</span>
-          </h3>
-          <p>
-            <span class="zh">每一份生成的妆教都<mark>反过来训练系统更懂妆面</mark>——风格库越大，反编译越准，B2B / B2C 双边复利。</span>
-            <span class="en">Every tutorial generated <mark>trains the system to understand makeup better</mark> — the larger the style library, the cleaner the decompile, compounding on both sides.</span>
-          </p>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- =========================================================== -->
-  <!-- ABOUT — INVITE MODE                                           -->
-  <!-- =========================================================== -->
-  <section id="about" class="section section--about">
+  <!-- ============================================================ -->
+  <!-- §6 · FUTURE WORK                                               -->
+  <!-- ============================================================ -->
+  <section id="future" class="section section--future">
     <div class="container container--narrow">
-      <div class="kicker mono">[ 08 · <span class="zh">一起做？</span><span class="en">Build with me?</span> ]</div>
-
+      <div class="kicker mono">[ § 6 ]</div>
       <h2 class="section__title">
-        <span class="zh">这是我一个人做的——<br/>但<em>不是终点</em>。我在找人。</span>
-        <span class="en">I built this alone.<br/>But this isn&rsquo;t where it ends. I&rsquo;m <em>looking</em>.</span>
+        <span class="zh">Future Work</span>
+        <span class="en">Future Work</span>
       </h2>
 
       <p class="lead">
-        <span class="zh">物理、数学、模块、所有 limitations——目前都是我一个人在想。这个 idea 我相信它能走远，<mark>但它需要更多人推它一把</mark>：</span>
-        <span class="en">The model, the math, the modules, every limitation — all of it is just me, thinking. I believe this idea can travel far, <mark>but it takes more people to push</mark>:</span>
+        <span class="zh">下面沿三条正交的轴列出计划中的延伸方向：深化（当前数学建模的细化）、拓宽（适用范围的扩展）、与上层（相邻能力的衔接）。</span>
+        <span class="en">Planned extensions are organised along three orthogonal axes: deeper (refinement of the current formulation), wider (broadening applicability), and higher (adjacent capabilities).</span>
       </p>
 
-      <ul class="invite-list">
-        <li>
-          <span class="invite-list__icon">✦</span>
-          <span class="zh"><strong>美妆 / 化妆师</strong>——告诉我"画妆"在现实里是什么样的流程，我的模型大概率简化错了。</span>
-          <span class="en"><strong>Makeup artists / industry folks</strong> — tell me how real-world makeup actually gets painted. My model is almost certainly the wrong simplification.</span>
-        </li>
-        <li>
-          <span class="invite-list__icon">✦</span>
-          <span class="zh"><strong>研究 / 工程师</strong>——挑战这套数学。Lab 空间损失、GMM 调参、感知评估，都欢迎来打。</span>
-          <span class="en"><strong>Researchers / engineers</strong> — stress-test the math. Lab-space loss, GMM tuning, perceptual evaluation — come at it.</span>
-        </li>
-        <li>
-          <span class="invite-list__icon">✦</span>
-          <span class="zh"><strong>产品 / 合伙人</strong>——做下一代美妆工具的，咱们换换思路。</span>
-          <span class="en"><strong>Product folks / co-founders</strong> — anyone building next-gen beauty tools, let&rsquo;s trade notes.</span>
-        </li>
-        <li>
-          <span class="invite-list__icon">✦</span>
-          <span class="zh"><strong>被这个点子吸到的朋友</strong>——你不用是任何"专业"。能聊就行。</span>
-          <span class="en"><strong>Anyone the idea pulls in</strong> — you don&rsquo;t need credentials. A conversation is enough.</span>
-        </li>
-      </ul>
+      <div class="future-grid">
 
-      <div class="contact-card">
-        <div class="contact-card__row mono">
-          <span class="contact-card__k">EMAIL</span>
-          <span class="contact-card__v">[ your-email@domain ]</span>
-        </div>
-        <div class="contact-card__row mono">
-          <span class="contact-card__k">CODE</span>
-          <span class="contact-card__v">
-            <span class="zh">私密仓库 · 接触后开放</span>
-            <span class="en">Private repo · opened on request</span>
-          </span>
-        </div>
-        <div class="contact-card__row mono">
-          <span class="contact-card__k">LOOKING</span>
-          <span class="contact-card__v">
-            <span class="zh">合伙人 / 资深工程师 / 行业顾问 / 想聊的人</span>
-            <span class="en">Co-founder / senior engineer / industry advisor / curious people</span>
-          </span>
-        </div>
+        <article class="future-axis">
+          <div class="future-axis__name mono">DEEPER</div>
+          <h3>
+            <span class="zh">深化 · 细化当前建模</span>
+            <span class="en">Refining the current formulation</span>
+          </h3>
+          <ul>
+            <li>
+              <span class="zh">完成 GMM temperature、K、p 的超参数扫描；</span>
+              <span class="en">Complete the hyperparameter sweep over GMM temperature, K, and p.</span>
+            </li>
+            <li>
+              <span class="zh">用感知损失（Lab 空间或加权 RGB）替换 RGB-L2；</span>
+              <span class="en">Replace RGB-L2 with a perceptual loss (Lab-space or weighted RGB).</span>
+            </li>
+            <li>
+              <span class="zh">每区域 <code>D</code> 在 RGB 空间的散点可视化，用于 palette 抽取的诊断；</span>
+              <span class="en">RGB-space scatter visualisation of per-region <code>D</code> for diagnostic inspection of palette extraction.</span>
+            </li>
+            <li>
+              <span class="zh">缓解少数高饱和度模式稀释（§5.2）：评估每区域 K 提升、降低 GMM temperature、重要性采样、hull-seeded GMM 初始化等候选方案。</span>
+              <span class="en">Mitigate minority-mode dilution (§5.2): evaluate per-region K bump, lower GMM temperature, importance-weighted EM, and hull-seeded GMM initialisation as candidate fixes.</span>
+            </li>
+          </ul>
+        </article>
+
+        <article class="future-axis">
+          <div class="future-axis__name mono">WIDER</div>
+          <h3>
+            <span class="zh">拓宽 · 扩展适用范围</span>
+            <span class="en">Broadening applicability</span>
+          </h3>
+          <ul>
+            <li>
+              <span class="zh">放宽输入要求：仅给定 M 时估计 B；</span>
+              <span class="en">Relax the input requirement: estimate B from M alone.</span>
+            </li>
+            <li>
+              <span class="zh">视频输入；姿态不一致的鲁棒性；</span>
+              <span class="en">Video input; pose-mismatch tolerance.</span>
+            </li>
+            <li>
+              <span class="zh">跨人群、跨文化的妆面传统覆盖（如 KR / JP / SEA / Western）。</span>
+              <span class="en">Cross-demographic and cross-cultural makeup-tradition coverage (KR / JP / SEA / Western).</span>
+            </li>
+          </ul>
+        </article>
+
+        <article class="future-axis">
+          <div class="future-axis__name mono">HIGHER</div>
+          <h3>
+            <span class="zh">上层 · 衔接相邻能力</span>
+            <span class="en">Adjacent capabilities</span>
+          </h3>
+          <ul>
+            <li>
+              <span class="zh">妆面迁移：将分解得到的妆面应用至任意素颜目标（当前 pipeline 仅做分析）；</span>
+              <span class="en">Face morphing: apply a decomposed look to an arbitrary bare-face target (the current pipeline only analyses).</span>
+            </li>
+            <li>
+              <span class="zh">产品推荐：将抽取色号映射到品牌 SKU；</span>
+              <span class="en">Product recommendation: link extracted shades to brand SKUs.</span>
+            </li>
+            <li>
+              <span class="zh">在复演序列上叠加难度、时间与替代品的标注。</span>
+              <span class="en">Skill-level, time, and substitution annotations on the replay sequence.</span>
+            </li>
+          </ul>
+        </article>
+
       </div>
     </div>
   </section>
 
-  <!-- =========================================================== -->
-  <!-- FOOTER                                                        -->
-  <!-- =========================================================== -->
+  <!-- ============================================================ -->
+  <!-- §7 · POTENTIAL APPLICATIONS                                    -->
+  <!-- ============================================================ -->
+  <section id="applications" class="section section--applications">
+    <div class="container container--narrow">
+      <div class="kicker mono">[ § 7 ]</div>
+      <h2 class="section__title">
+        <span class="zh">潜在应用</span>
+        <span class="en">Potential Applications</span>
+      </h2>
+
+      <div class="app-grid">
+
+        <article class="app-card">
+          <div class="app-card__tag mono">7.1 · CONSUMER</div>
+          <h3>
+            <span class="zh">移动端妆教生成</span>
+            <span class="en">Mobile tutorial generation</span>
+          </h3>
+          <p>
+            <span class="zh">终端用户上传参考妆面，GMR 返回针对该用户素颜的个性化教程序列。可经微信小程序分发。</span>
+            <span class="en">End user uploads a reference look; GMR returns a tutorial sequence tailored to the user's bare face. Distribution via WeChat mini-program.</span>
+          </p>
+        </article>
+
+        <article class="app-card">
+          <div class="app-card__tag mono">7.2 · STUDIO</div>
+          <h3>
+            <span class="zh">工作室咨询预演</span>
+            <span class="en">Studio consultation pre-visualisation</span>
+          </h3>
+          <p>
+            <span class="zh">化妆工作室对客户的参考照片做反编译，即时判断所需产品、时间估计与复现可行性。</span>
+            <span class="en">Makeup artists decompose a client's reference photos to immediately determine required products, time estimates, and feasibility of reproduction.</span>
+          </p>
+        </article>
+
+        <article class="app-card">
+          <div class="app-card__tag mono">7.3 · RETAIL</div>
+          <h3>
+            <span class="zh">零售妆-品绑定</span>
+            <span class="en">Product-look bundling</span>
+          </h3>
+          <p>
+            <span class="zh">化妆品品牌将定制妆面与产品组合绑定发售；QR 链接到 GMR 教程，向购买者展示如何用这些产品复现妆面。</span>
+            <span class="en">Cosmetic brands ship a curated look paired with a product bundle; a QR-linked GMR tutorial shows the buyer how to reproduce the look using exactly those products.</span>
+          </p>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- §8 · CITATION                                                  -->
+  <!-- ============================================================ -->
+  <section id="citation" class="section section--citation">
+    <div class="container container--narrow">
+      <div class="kicker mono">[ § 8 ]</div>
+      <h2 class="section__title">
+        <span class="zh">引用</span>
+        <span class="en">Citation</span>
+      </h2>
+      <p class="dim">
+        <span class="zh">若引用本工作，请使用如下格式：</span>
+        <span class="en">If this work is referenced, please cite:</span>
+      </p>
+      <pre class="bibtex"><code>@misc{gmr2026,
+  author = {JT. Z.},
+  title  = {{GMR}: {G}aussian {M}akeup {R}eplayer},
+  year   = {2026},
+  note   = {Independent project},
+  url    = {https://545411679.github.io/GMR-project-demo/}
+}</code></pre>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- §9 · CONTACT                                                   -->
+  <!-- ============================================================ -->
+  <section id="contact" class="section section--contact">
+    <div class="container container--narrow">
+      <div class="kicker mono">[ § 9 ]</div>
+      <h2 class="section__title">
+        <span class="zh">联系</span>
+        <span class="en">Contact</span>
+      </h2>
+
+      <p class="lead">
+        <span class="zh">GMR 为作者独立完成的研究项目。关于方法、应用方向或合作的来信，请见以下方式。</span>
+        <span class="en">GMR is an independent research project by the author. Correspondence regarding the method, applications, or collaboration is directed below.</span>
+      </p>
+
+      <dl class="contact-rows">
+        <div class="contact-row">
+          <dt class="contact-row__k">Email</dt>
+          <dd class="contact-row__v"><a href="mailto:jintong.zhang23@student.xjtlu.edu.cn">jintong.zhang23@student.xjtlu.edu.cn</a></dd>
+        </div>
+        <div class="contact-row">
+          <dt class="contact-row__k">Personal</dt>
+          <dd class="contact-row__v"><a href="mailto:545411679@qq.com">545411679@qq.com</a></dd>
+        </div>
+        <div class="contact-row">
+          <dt class="contact-row__k">GitHub</dt>
+          <dd class="contact-row__v"><a href="https://github.com/545411679/GMR-project-demo" target="_blank" rel="noopener">github.com/545411679/GMR-project-demo</a></dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- FOOTER                                                         -->
+  <!-- ============================================================ -->
   <footer class="footer">
     <div class="container">
       <div class="footer__row mono">
-        <span>✦ MUA · <span class="zh">妆教编译器</span><span class="en">makeup decompiler</span></span>
-        <span class="zh">© 2026 · 还在长 · come build it bigger</span>
-        <span class="en">© 2026 · still growing · come build it bigger</span>
+        <span>✦ GMR · <span class="zh">高斯妆容复演器</span><span class="en">Gaussian Makeup Replayer</span></span>
+        <span class="zh">© 2026 · JT. Z. · 独立项目</span>
+        <span class="en">© 2026 · JT. Z. · independent project</span>
       </div>
     </div>
   </footer>

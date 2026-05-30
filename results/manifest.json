@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "showcase_id": "B_showcase",
+  "gallery_ids": [
+    "B_001",
+    "B_002",
+    "B_003"
+  ],
+  "all_ids": [
+    "B_001",
+    "B_002",
+    "B_003",
+    "B_showcase"
+  ],
+  "looks": [
+    "M1",
+    "M2",
+    "M3"
+  ],
+  "columns": [
+    "B",
+    "M",
+    "M_bnd",
+    "palette_gmm",
+    "palette_merged",
+    "strokes",
+    "steps_mp4",
+    "recon_over_M",
+    "M_compare",
+    "rmse"
+  ],
+  "p": 0.7,
+  "threshold": 3.0,
+  "decompose_method": "gmm",
+  "gmm_temperature": 3.0
+}

@@ -8,6 +8,19 @@ desktop.ini
 .idea/
 *.swp
 
-# Python (this is a static site — no source code belongs here)
+# Python
 __pycache__/
 *.pyc
+
+# Build script + raw inputs are kept private (not part of the static site)
+build_demo_assets.py
+inputs/
+
+# Heavy intermediate artifacts the page does NOT load — keep the repo small.
+# The page uses: *.jpg, *_palette_*.png, *_steps_quality.mp4, *_steps_poster.jpg,
+# manifest.json, rmse_table.json, B_summary.json.
+results/**/*_frames/
+results/**/*.gif
+results/**/*_steps.png
+results/**/*_steps_compat.mp4
+results/**/*_meta.json
