@@ -80,7 +80,7 @@
       case 'palette_gmm':    return base + `${look}_palette_gmm.png`;
       case 'palette_merged': return base + `${look}_palette_merged.png`;
       case 'strokes':        return base + `${look}_strokes.jpg`;
-      case 'steps_mp4':      return base + `${look}_steps_quality.mp4`;
+      case 'steps_mp4':      return base + `${look}_steps_compat.mp4`;
       case 'steps_poster':   return base + `${look}_steps_poster.jpg`;
       case 'recon_over_M':   return base + `${look}_recon_over_M.jpg`;
       case 'M_cmp':          return base + `${look}.jpg`;    // duplicate of M
@@ -294,7 +294,8 @@
     tabs.forEach((t, i) => t.addEventListener('click', () => selectIdx(i)));
     vids.forEach((v, i) => v.addEventListener('click', () => selectIdx(i)));
 
-    selectIdx(0);
+    // Default selection: M2 (index 1) if present, else the first look.
+    selectIdx(Math.min(1, vids.length - 1));
   }
 
   // Build + wire the full video-swiper + process-bar block for one B
@@ -316,6 +317,7 @@
       + `  <div class="ms-videos">`
       + `    <div class="ms-vstrip">${videos}</div>`
       + `  </div>`
+      + `  <div class="ms-hint mono">hover to play computed makeup steps (tap on mobile)</div>`
       + `  <div class="ms-tabs">${tabs}</div>`
       + `  <div class="ms-bar" data-modal-group></div>`
       + `</div>`;
@@ -333,6 +335,18 @@
     }
     const sum = await loadBsummary(manifest.showcase_id);
     mountMSBlock(el, manifest.showcase_id, sum.per_look_rmse || {});
+  }
+
+  // §0 · a small quiet looping replay beside the abstract.
+  function renderHeroMedia(manifest) {
+    const el = document.getElementById('hero-media');
+    if (!el || !manifest || !manifest.showcase_id) return;
+    const base   = `${RESULTS_ROOT}/${manifest.showcase_id}/`;
+    const mp4    = base + 'M2_steps_compat.mp4';
+    const poster = base + 'M2_steps_poster.jpg';
+    el.innerHTML =
+      `<video src="${mp4}" poster="${poster}" autoplay loop muted playsinline></video>`
+      + `<figcaption class="mono">GMR computed makeup procedure - Showcase M2</figcaption>`;
   }
 
   // ─ M · Motivation gallery: B + M1 + M2 + M3, static, spaced.
@@ -359,7 +373,7 @@
     if (!el || !manifest || !manifest.showcase_id) return;
     const base   = `${RESULTS_ROOT}/${manifest.showcase_id}/`;
     const still  = base + 'M2.jpg';
-    const mp4    = base + 'M2_steps_quality.mp4';
+    const mp4    = base + 'M2_steps_compat.mp4';
     const poster = base + 'M2_steps_poster.jpg';
     el.innerHTML =
       `<figure class="teaser-pane teaser-pane--still">`
@@ -614,6 +628,25 @@
     const detail = el.querySelector('[data-role="detail"]');
     let openId = null;
 
+    function openGallery(id, doScroll) {
+      openId = id;
+      el.querySelectorAll('.gcard').forEach((c) =>
+        c.classList.toggle('gcard--selected', c.getAttribute('data-bid') === id));
+      const sum = summaries[id] || { per_look_rmse: {} };
+      detail.hidden = false;
+      detail.innerHTML =
+        `<div class="gdetail">`
+        + `  <div class="gdetail__table">${renderBgrid(id, sum.per_look_rmse || {})}</div>`
+        + `  <aside class="gdetail__frame" data-role="vframe">`
+        + `    <div class="gdetail__prompt mono">`
+        + `      <span class="zh">点击表格中的 [step MP4] 查看上妆步骤回放</span>`
+        + `      <span class="en">click a [step MP4] cell to replay the makeup steps</span>`
+        + `    </div>`
+        + `  </aside>`
+        + `</div>`;
+      if (doScroll) detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
     el.addEventListener('click', function (ev) {
       const card = ev.target.closest('.gcard');
       if (!card) return;
@@ -627,24 +660,11 @@
         el.querySelectorAll('.gcard').forEach((c) => c.classList.remove('gcard--selected'));
         return;
       }
-
-      openId = id;
-      el.querySelectorAll('.gcard').forEach((c) =>
-        c.classList.toggle('gcard--selected', c === card));
-      const sum = summaries[id] || { per_look_rmse: {} };
-      detail.hidden = false;
-      detail.innerHTML =
-        `<div class="gdetail">`
-        + `  <div class="gdetail__table">${renderBgrid(id, sum.per_look_rmse || {})}</div>`
-        + `  <aside class="gdetail__frame" data-role="vframe">`
-        + `    <div class="gdetail__prompt mono">`
-        + `      <span class="zh">点击表格中的 [step MP4] 查看上妆步骤回放</span>`
-        + `      <span class="en">click a [step MP4] cell to replay the makeup steps</span>`
-        + `    </div>`
-        + `  </aside>`
-        + `</div>`;
-      detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      openGallery(id, true);
     });
+
+    // Default: open the first gallery case (no scroll on initial load).
+    if (manifest.gallery_ids.length) openGallery(manifest.gallery_ids[0], false);
 
     // Click a [step MP4] cell → play it in the side frame.
     el.addEventListener('click', function (ev) {
@@ -769,6 +789,88 @@
     }, true);
   }
 
+  // Scatter ✦ marks at random grid-dot positions inside the fixed overlay.
+  function wireGridSparkles() {
+    const grid = document.querySelector('.bg-grid');
+    if (!grid) return;
+    let layer = grid.querySelector('.bg-grid__stars');
+    if (!layer) {
+      layer = document.createElement('div');
+      layer.className = 'bg-grid__stars';
+      grid.appendChild(layer);
+    }
+    const CELL = 34;
+    function populate() {
+      const cols = Math.ceil(window.innerWidth  / CELL);
+      const rows = Math.ceil(window.innerHeight / CELL);
+      // ~1% of intersections become a star (plus the drift overscan rows).
+      const count = Math.max(8, Math.round(cols * rows * 0.01));
+      const used = new Set();
+      let html = '';
+      let guard = 0;
+      while (used.size < count && guard < count * 8) {
+        guard++;
+        const c = 1 + Math.floor(Math.random() * (cols - 1));
+        const r = 1 + Math.floor(Math.random() * (rows + 1)); // overscan for drift
+        const key = c + ',' + r;
+        if (used.has(key)) continue;
+        used.add(key);
+        const x = c * CELL + CELL / 2;
+        const y = r * CELL + CELL / 2;
+        html += `<span class="bg-grid__star" style="left:${x}px;top:${y}px">✦</span>`;
+      }
+      layer.innerHTML = html;
+    }
+    populate();
+    let t = null;
+    window.addEventListener('resize', function () {
+      clearTimeout(t);
+      t = setTimeout(populate, 250);
+    }, { passive: true });
+  }
+
+  // Fixed grid overlay: invert to light lines when a dark band (teaser /
+  // formulation) is centred in the viewport.
+  function wireBgGrid() {
+    const grid = document.querySelector('.bg-grid');
+    if (!grid) return;
+    const darks = Array.from(document.querySelectorAll('.section--teaser, .section--formulation'));
+    if (!darks.length) return;
+    let ticking = false;
+    function update() {
+      ticking = false;
+      const cy = window.innerHeight / 2;
+      const onDark = darks.some((s) => {
+        const r = s.getBoundingClientRect();
+        return r.top <= cy && r.bottom >= cy;
+      });
+      grid.classList.toggle('bg-grid--on-dark', onDark);
+    }
+    window.addEventListener('scroll', function () {
+      if (!ticking) { ticking = true; requestAnimationFrame(update); }
+    }, { passive: true });
+    window.addEventListener('resize', update, { passive: true });
+    update();
+  }
+
+  // Scroll-reveal: sections fade + rise 12px as they enter the viewport.
+  // The .reveal class is only added by JS, so without JS nothing is hidden.
+  function wireScrollReveal() {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    // Skip the above-the-fold abstract so it never flashes hidden on load.
+    const targets = Array.from(document.querySelectorAll('.section'))
+      .filter((s) => s.id !== 'top');
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add('reveal--in');
+          obs.unobserve(e.target);
+        }
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.06 });
+    targets.forEach((t) => { t.classList.add('reveal'); obs.observe(t); });
+  }
+
   // Scroll-spy: highlight the nav link of the section currently in view.
   function wireScrollSpy() {
     const links = Array.from(document.querySelectorAll('.topnav a[href^="#"]'));
@@ -804,6 +906,7 @@
     renderMath();
     const manifest = await loadManifest();
     const rt       = await loadRmseTable();
+    renderHeroMedia(manifest);
     renderMotivation(manifest);
     renderTeaser(manifest);
     await renderShowcase(manifest);
@@ -812,6 +915,9 @@
     wireHoverMp4();
     wireTeaserMp4();
     wireScrollSpy();
+    wireScrollReveal();
+    wireBgGrid();
+    wireGridSparkles();
   }
 
   if (document.readyState === 'complete' || document.readyState === 'interactive') {

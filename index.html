@@ -18,6 +18,9 @@
 </head>
 <body>
 
+  <!-- Fixed drifting grid overlay (inverts light/dark per section) -->
+  <div class="bg-grid" aria-hidden="true"></div>
+
   <!-- ============================================================ -->
   <!-- NAV / LANG TOGGLE                                              -->
   <!-- ============================================================ -->
@@ -48,39 +51,46 @@
   <section id="top" class="section section--abstract">
     <div class="container container--narrow">
 
-      <div class="paper-meta mono">
-        [ GMR · A Gaussian-mixture pipeline for facial cosmetic decomposition · 2026 · independent · v0.1 ]
-      </div>
+      <div class="paper-head">
+       <div class="paper-head__text">
+        <div class="paper-meta mono">
+          [ GMR · A Gaussian-mixture pipeline for facial cosmetic decomposition · 2026 · independent · v0.1 ]
+        </div>
 
-      <h1 class="paper-title">
-        <span class="zh">GMR：高斯妆容复演器</span>
-        <span class="en">GMR: Gaussian Makeup Replayer</span>
-      </h1>
-      <p class="paper-subtitle">
-        <span class="zh">基于高斯混合的妆面分解与笔触复演 pipeline。</span>
-        <span class="en">A Gaussian-mixture pipeline for facial cosmetic decomposition and brushstroke replay.</span>
-      </p>
+        <h1 class="paper-title">
+          <span class="zh"><span class="title-mark">GMR</span>：高斯妆容复演器</span>
+          <span class="en"><span class="title-mark">GMR</span>: Gaussian Makeup Replayer</span>
+        </h1>
+        <p class="paper-subtitle">
+          <span class="zh">基于高斯混合的妆面分解与笔触复演 pipeline。</span>
+          <span class="en">A Gaussian-mixture pipeline for facial cosmetic decomposition and brushstroke replay.</span>
+        </p>
 
-      <div class="paper-authors mono">
-        <span>JT. Z.</span>
-        <span class="dim">·</span>
-        <span><span class="zh">独立项目</span><span class="en">Independent project</span></span>
-        <span class="dim">·</span>
-        <span>2026</span>
-      </div>
+        <div class="paper-authors mono">
+          <span>JT. Z.</span>
+          <span class="dim">·</span>
+          <span><span class="zh">独立项目</span><span class="en">Independent project</span></span>
+          <span class="dim">·</span>
+          <span>2026</span>
+        </div>
 
-      <div class="paper-links">
-        <a class="plink" href="https://github.com/545411679/GMR-project-demo" target="_blank" rel="noopener">[ GitHub ]</a>
-        <a class="plink" href="#citation">[ BibTeX ]</a>
-        <a class="plink" href="#results">[ Demo ]</a>
+        <div class="paper-links">
+          <a class="plink" href="https://github.com/545411679/GMR-project-demo" target="_blank" rel="noopener">[ GitHub ]</a>
+          <a class="plink" href="#citation">[ BibTeX ]</a>
+          <a class="plink" href="#results">[ Demo ]</a>
+        </div>
+       </div>
+       <figure class="paper-head__media" id="hero-media"></figure>
       </div>
 
       <div class="abstract-block">
+       <div class="abstract-block__text">
         <div class="abstract-label mono">Abstract</div>
         <p class="abstract-body">
           <span class="zh">本工作提出 Gaussian Makeup Replayer（GMR），一种将妆面图像分解为基于高斯混合的色号 palette、并以有序 brushstroke 序列在素颜目标上复演结果的方法。给定同一对象的素颜图像 <code>B</code> 与上妆图像 <code>M</code>，GMR 依次执行：(i) 反演 alpha 合成以恢复妆面层 <code>D</code>；(ii) 在 RGB 空间通过 K 分量 GMM 将 <code>D</code> 分解为 N 个基础色号；(iii) 基于关键点驱动的掩码将色号分配至语义化面部分区；(iv) 合成有序 brushstroke 复演序列。我们在多个 subject 与多种风格强度的输入妆面上给出定性结果，并在 GMR(p=0.70, N=6) 配置下报告重建 RMSE。</span>
           <span class="en">We present Gaussian Makeup Replayer (GMR), a method for decomposing facial cosmetic images into a Gaussian-mixture shade palette and replaying the result as an ordered brushstroke sequence on a bare-face target. Given a bare-face image <code>B</code> and a made-up image <code>M</code> of the same subject, GMR (i) inverts the alpha composite to recover the cosmetic layer <code>D</code>, (ii) decomposes <code>D</code> into N base shades via a K-component GMM in RGB space, (iii) assigns shades to semantic face regions via landmark-driven masks, and (iv) synthesizes an ordered brushstroke replay. We report qualitative results across multiple subjects at varying style intensities and reconstruction RMSE under the GMR(p=0.70, N=6) configuration.</span>
         </p>
+       </div>
       </div>
     </div>
   </section>
@@ -119,6 +129,14 @@
         <span class="en">Results</span>
       </h2>
 
+      <div class="stat-callout">
+        <div class="stat-callout__num mono">~1.2%</div>
+        <div class="stat-callout__txt">
+          <span class="zh">最终帧重建误差仅约 <strong>1.2%</strong>（mask 内平均 RMSE ≈ 3.0 / 255），逐笔触复演的结果与原始妆面几乎不可区分。</span>
+          <span class="en">Final-frame reconstruction lands within <strong>~1.2%</strong> of the target (mean RMSE &asymp; 3.0 on 0&ndash;255, inside the mask) &mdash; the stroke-by-stroke replay is near-indistinguishable from the original look.</span>
+        </div>
+      </div>
+
       <!-- 1.1  Qualitative — showcase B -->
       <h3 class="subsection__title">
         <span class="zh">1.1   定性结果 · 主对象</span>
@@ -126,8 +144,8 @@
       </h3>
 
       <p class="lead">
-        <span class="zh">下方网格展示 GMR 在主对象 (showcase B) 上对三种风格强度的妆面 (M1 / M2 / M3) 的完整反编译输出。每行对应一个输入 Mi，每列对应 pipeline 输出的一类产物：从原始输入到分区边界、GMM palette、修剪后 palette、stroke regions、复演 MP4、重建合成、原图对比，到末尾 RMSE。</span>
-        <span class="en">The grid below shows GMR's full decomposition outputs on the showcase subject across three style intensities (M1 / M2 / M3). Each row corresponds to one input Mi; each column is one artefact emitted by the pipeline — from input through region boundaries, GMM palette, trimmed palette, stroke regions, replay MP4, reconstruction composite, original comparison, to per-look RMSE.</span>
+        <span class="zh">选择 M1 / M2 / M3 三个 showcase 中的一个，上方播放该妆面在主对象 (showcase B) 上的逐笔触复演 (hover 播放)；下方的演示序列图片逐步介绍 GMR 运行的全部产物：原始素颜 B、上妆 M、分区边界、GMM palette、修剪后 palette、stroke regions、复演重建的妆面，以及用于对照的原始 M。点击任一图可放大查看，末尾给出该次重建的 RMSE。</span>
+        <span class="en">Pick one of three showcases (M1 / M2 / M3): the player shows the look&rsquo;s stroke-by-stroke replay on the showcase subject (hover to play), and the procedure demonstration series below walks through every artefact of that decompile — bare face B, made-up M, segmentation borders, GMM palette, trimmed palette, stroke regions, the replayed reconstruction, and the original M for comparison. Click any figure to enlarge; the per-look RMSE closes the series.</span>
       </p>
 
       <div id="showcase-grid" class="results-grid" data-role="showcase">

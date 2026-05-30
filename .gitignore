@@ -22,5 +22,5 @@ inputs/
 results/**/*_frames/
 results/**/*.gif
 results/**/*_steps.png
-results/**/*_steps_compat.mp4
+results/**/*_steps_quality.mp4
 results/**/*_meta.json

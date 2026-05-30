@@ -41,6 +41,86 @@
 }
 
 /* ====================================================================
+   Fixed drifting grid overlay
+   Thin lines + faint berry intersection dots. Sits above section
+   backgrounds (pointer-events:none, very low contrast) and slowly
+   drifts. JS toggles .bg-grid--on-dark when a dark band is centred.
+   ==================================================================== */
+
+.bg-grid {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+  --grid-line: rgba(26, 19, 10, 0.06);     /* dark lines for light sections */
+  --grid-dot:  rgba(168, 50, 78, 0.16);    /* berry intersection dots */
+  --grid-star: rgba(168, 50, 78, 0.30);    /* berry ✦ marks */
+  background-image:
+    radial-gradient(var(--grid-dot) 1.3px, transparent 1.4px),
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 34px 34px, 34px 34px, 34px 34px;
+  background-position: 0 0, 0 0, 0 0;
+  animation: gridDrift 60s linear infinite;
+  transition: --grid-line 400ms;
+}
+.bg-grid--on-dark {
+  --grid-line: rgba(251, 247, 238, 0.08);  /* light lines for dark sections */
+  --grid-dot:  rgba(232, 194, 203, 0.20);  /* lighter berry dots */
+  --grid-star: rgba(232, 194, 203, 0.42);
+}
+@keyframes gridDrift {
+  from { background-position: 0 0, 0 0, 0 0; }
+  to   { background-position: 34px 68px, 34px 68px, 34px 68px; }
+}
+
+/* Scattered ✦ marks — placed by JS at random dot positions, drift in
+   sync with the dots via the same 34/68 vector. */
+.bg-grid__stars {
+  position: absolute;
+  inset: 0;
+  animation: starDrift 60s linear infinite;
+}
+@keyframes starDrift {
+  from { transform: translate(0, 0); }
+  to   { transform: translate(34px, 68px); }
+}
+.bg-grid__star {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  color: var(--grid-star);
+  font-size: 12px;
+  line-height: 1;
+}
+
+/* Small cards + all media sit ABOVE the grid (z 2 > grid z 1) so it does
+   not show through them. Big container panels (abstract-block, results-grid,
+   gallery-strip, ms-bar, sections) are left untouched, so the grid still
+   textures them. */
+.stat-callout,
+.ms-vid,
+.ms-stage,
+.paper-head__media,
+.mot-tile,
+.teaser-pane,
+.method-sub,
+.method-figure,
+.arch-card,
+.app-card,
+.future-axis,
+.limit-list li,
+.bibtex,
+.contact-rows,
+.gcard,
+.gdetail__frame,
+.gdetail__table .rg,
+.rmse {
+  position: relative;
+  z-index: 2;
+}
+
+/* ====================================================================
    Reset
    ==================================================================== */
 
@@ -230,6 +310,13 @@ strong { font-weight: 700; color: var(--ink); }
   letter-spacing: 0.04em;
 }
 .paper-title    { margin-bottom: 0.4rem; }
+.paper-title .title-mark {
+  background: var(--berry);
+  color: #fff;
+  padding: 0 0.14em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
 .paper-subtitle { color: var(--ink-soft); font-size: clamp(1rem, 1.4vw, 1.15rem);
                   margin-bottom: 1.25rem; line-height: 1.4; max-width: 70ch; }
 .paper-authors  { font-size: 0.85rem; margin-bottom: 0.5rem;
@@ -252,6 +339,80 @@ strong { font-weight: 700; color: var(--ink); }
   padding: clamp(1.25rem, 2.5vw, 1.75rem);
   box-shadow: var(--shadow);
 }
+
+/* Title block stays full-width / unaffected. The replay floats in the
+   right gutter (absolute) on wide screens, and drops below on narrow. */
+.section--abstract { position: relative; }
+.paper-head { display: block; margin-bottom: 2rem; }
+.paper-head__text { width: 100%; }
+
+.paper-head__media {
+  position: absolute;
+  top: clamp(6.4rem, 10vw, 8.6rem);  /* slightly up */
+  right: clamp(7rem, 17vw, 17rem);   /* slightly further left */
+  width: clamp(160px, 15vw, 210px);
+  margin: 0;
+}
+.paper-head__media video {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  background: var(--ink);
+  border: var(--b);
+  box-shadow: var(--shadow-sm);
+  display: block;
+}
+.paper-head__media figcaption {
+  margin-top: 0.4rem;
+  text-align: center;
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+/* Below ~1280px there isn't enough side gutter — drop it into the flow. */
+@media (max-width: 1280px) {
+  .paper-head__media {
+    position: static;
+    width: clamp(180px, 40vw, 240px);
+    margin: 1.5rem 0 0;
+  }
+}
+
+/* Stat callout — makes the headline number legible to non-experts */
+.stat-callout {
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 2.5vw, 1.75rem);
+  background: var(--ink);
+  color: var(--bg);
+  border: var(--b);
+  box-shadow: var(--shadow-berry);
+  padding: clamp(1rem, 2.5vw, 1.5rem) clamp(1.25rem, 3vw, 2rem);
+  margin: 1.5rem 0 2rem;
+}
+.stat-callout__num {
+  flex: 0 0 auto;
+  font-family: 'Archivo Black', sans-serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  line-height: 1;
+  color: var(--berry-soft);
+}
+.stat-callout__txt {
+  font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+  line-height: 1.5;
+}
+.stat-callout__txt strong { color: var(--berry-soft); }
+@media (max-width: 600px) {
+  .stat-callout { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+}
+
+/* Scroll-reveal — added by JS only, so no-JS keeps everything visible */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.reveal--in { opacity: 1; transform: none; }
 .abstract-label {
   font-size: 0.75rem;
   letter-spacing: 0.1em;
@@ -1043,6 +1204,14 @@ figcaption, .caption {
   line-height: 1.35;
 }
 .ms-vid--selected .ms-vid__tag { color: var(--ink); }
+
+.ms-hint {
+  text-align: center;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--berry);
+  margin: 0.25rem 0 0.5rem;
+}
 
 /* Tabs — the only selector, M1 / M2 / M3 -------------------------- */
 
