@@ -715,9 +715,14 @@
   // 5.  Hover-to-play for MP4 cells (delegated)
   // ------------------------------------------------------------
   function wireHoverMp4() {
+    function toLastFrame(v) {
+      const end = isFinite(v.duration) && v.duration > 0 ? v.duration : 0;
+      if (end) { try { v.currentTime = Math.max(0, end - 0.04); } catch (e) {} }
+    }
     document.body.addEventListener('mouseover', function (ev) {
       const v = ev.target.closest('video[data-role="hover-mp4"]');
       if (!v) return;
+      try { v.currentTime = 0; } catch (e) {}     // hover replays from the start
       const p = v.play();
       if (p && typeof p.catch === 'function') p.catch(() => {});
     });
@@ -728,8 +733,8 @@
       const to = ev.relatedTarget;
       if (to && v.contains(to)) return;
       v.pause();
-      // Snap back to the poster (last frame ≈ recon) by resetting
-      v.currentTime = 0;
+      // Rest state shows the LAST frame (matches the poster), not frame 0.
+      toLastFrame(v);
     });
   }
 
