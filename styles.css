@@ -310,7 +310,7 @@ strong { font-weight: 700; color: var(--ink); }
   letter-spacing: 0.04em;
 }
 .paper-title    { margin-bottom: 0.4rem; }
-.paper-title .title-mark {
+.title-mark {
   background: var(--berry);
   color: #fff;
   padding: 0 0.14em;
@@ -1466,6 +1466,107 @@ figcaption, .caption {
 @media (max-width: 720px) {
   .ms-modal__panel { width: 92vw; height: 80vh; }
 }
+
+/* ====================================================================
+   Welcome toast
+   ==================================================================== */
+
+.toast {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.toast[hidden] { display: none; }
+.toast__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 15, 10, 0.6);
+}
+.toast__panel {
+  position: relative;
+  z-index: 1;
+  width: min(92vw, 420px);
+  background: var(--bg-card);
+  border: var(--b);
+  box-shadow: var(--shadow);
+  padding: 1.5rem 1.5rem 1.25rem;
+  animation: toastIn 360ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
+}
+.toast__title {
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+  color: var(--berry);
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 0.6rem;
+  margin-bottom: 0.85rem;
+}
+.toast__group { margin-bottom: 1.1rem; }
+.toast__list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.toast__list li {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  padding-left: 1rem;
+  position: relative;
+}
+.toast__list li::before {
+  content: '✦';
+  position: absolute;
+  left: 0;
+  color: var(--berry);
+  font-size: 0.72rem;
+  top: 0.25em;
+}
+.toast__list li.toast__li--lab { padding-left: 1.4rem; }
+.toast__list li.toast__li--lab::before {
+  content: '🧪';
+  font-size: 0.95rem;
+  top: 0.05em;
+}
+.toast__list strong { color: var(--ink); font-weight: 800; }
+.toast__cta {
+  width: 100%;
+  background: var(--berry);
+  color: #fff;
+  border: var(--b);
+  padding: 0.7rem 1rem;
+  font-family: 'Inter', 'Noto Sans SC', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: transform 80ms, box-shadow 80ms;
+}
+.toast__cta:hover { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+.toast__cta:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--ink); }
+
+/* Topbar "updates" button — reopens the modal */
+.updates-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  background: var(--bg-card);
+  color: var(--ink);
+  border: var(--b-thin);
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: transform 80ms, box-shadow 80ms, background 120ms;
+}
+.updates-btn:hover { background: var(--berry-soft); }
+.updates-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
 
 /* ====================================================================
    Misc

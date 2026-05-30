@@ -39,6 +39,9 @@
         <a href="#future"><span class="zh">未来</span><span class="en">Future Work</span></a>
         <a href="#contact"><span class="zh">联系</span><span class="en">Contact</span></a>
       </nav>
+      <button id="toastBtn" class="updates-btn" aria-label="Show latest updates">
+        <span class="zh">✦ 动态</span><span class="en">✦ updates</span>
+      </button>
       <button id="langToggle" class="lang-btn" aria-label="Toggle language">
         <span class="zh">EN</span><span class="en">中</span>
       </button>
@@ -112,7 +115,7 @@
   <!-- ============================================================ -->
   <section id="teaser" class="section section--teaser">
     <div class="container">
-      <h2 class="teaser__head">GMR now has it:</h2>
+      <h2 class="teaser__head"><span class="title-mark">GMR</span> now has it:</h2>
       <p class="teaser__sub">Palette and strokes, computed and fully displayed:</p>
       <div class="teaser__show" id="teaser-show"></div>
     </div>
@@ -756,6 +759,58 @@
       </div>
     </div>
   </footer>
+
+  <!-- Welcome modal — hints + current status, centred over a dimmed page -->
+  <aside class="toast" id="welcome-toast" hidden>
+    <div class="toast__backdrop" data-action="toast-close"></div>
+    <div class="toast__panel">
+      <div class="toast__group">
+        <div class="toast__title mono">
+          <span class="zh">✦ 提示</span>
+          <span class="en">✦ Heads-up</span>
+        </div>
+        <ul class="toast__list">
+          <li>
+            <span class="zh">右上角可切换 <strong>中 / EN</strong> 语言。</span>
+            <span class="en">Toggle <strong>中 / EN</strong> at the top-right.</span>
+          </li>
+          <li>
+            <span class="zh">悬停任意视频即可播放。</span>
+            <span class="en">Hover any video to play it.</span>
+          </li>
+          <li>
+            <span class="zh">页面底部可查看我的完整联系方式。</span>
+            <span class="en">Reach my full contacts at the bottom of the page.</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="toast__group">
+        <div class="toast__title mono">
+          <span class="zh">✦ 最新动态</span>
+          <span class="en">✦ What&rsquo;s new</span>
+        </div>
+        <ul class="toast__list">
+          <li>
+            <span class="zh">§4 <strong>Math</strong> 已发布。</span>
+            <span class="en">§4 <strong>Math</strong> is released.</span>
+          </li>
+          <li>
+            <span class="zh">§2 <strong>Method</strong> 尚未完成 —— 可邮件或私信我。</span>
+            <span class="en">§2 <strong>Method</strong> unfinished — can email or DM me.</span>
+          </li>
+          <li class="toast__li--lab">
+            <span class="zh">2026/27 新功能 <strong>text2makeup</strong> 即将到来</span>
+            <span class="en">2026/27 new feature <strong>text2makeup</strong> incoming</span>
+          </li>
+        </ul>
+      </div>
+      <button class="toast__cta" data-action="toast-close">
+        <span class="zh">探索作品 →</span>
+        <span class="en">Explore the work →</span>
+      </button>
+    </div>
+  </aside>
 
   <script src="app.js"></script>
 </body>

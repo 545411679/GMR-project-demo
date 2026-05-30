@@ -789,6 +789,35 @@
     }, true);
   }
 
+  // Welcome modal — auto-shows once per session; reopenable via topbar button.
+  function wireToast() {
+    const toast = document.getElementById('welcome-toast');
+    if (!toast) return;
+    const btn = document.getElementById('toastBtn');
+
+    const SEEN_KEY = 'gmr-seen-v1';
+    function open()  { toast.hidden = false; document.body.style.overflow = 'hidden'; }
+    function close() { toast.hidden = true; document.body.style.overflow = ''; }
+
+    // First visit only: auto-show once, mark seen on OPEN so it never
+    // auto-shows again (persists across refreshes & sessions). The ✦
+    // updates button reopens it on demand.
+    let seen = false;
+    try { seen = localStorage.getItem(SEEN_KEY) === '1'; } catch (e) {}
+    if (!seen) {
+      setTimeout(open, 600);
+      try { localStorage.setItem(SEEN_KEY, '1'); } catch (e) {}
+    }
+
+    toast.addEventListener('click', function (ev) {
+      if (ev.target.closest('[data-action="toast-close"]')) close();
+    });
+    document.addEventListener('keydown', function (ev) {
+      if (!toast.hidden && ev.key === 'Escape') close();
+    });
+    if (btn) btn.addEventListener('click', open);
+  }
+
   // Scatter ✦ marks at random grid-dot positions inside the fixed overlay.
   function wireGridSparkles() {
     const grid = document.querySelector('.bg-grid');
@@ -918,6 +947,7 @@
     wireScrollReveal();
     wireBgGrid();
     wireGridSparkles();
+    wireToast();
   }
 
   if (document.readyState === 'complete' || document.readyState === 'interactive') {
